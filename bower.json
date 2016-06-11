@@ -1,0 +1,29 @@
+{
+  "name": "nebula",
+  "description": "A nebula generator",
+  "main": "nebula.js",
+  "authors": [
+    "ssrb"
+  ],
+  "license": "BSD-2-Clause",
+  "keywords": [
+    "generative",
+    "art"
+  ],
+  "homepage": "https://github.com/ssrb/nebula",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "gl-matrix": "~2.3.1",    
+    "angular": "^1.5.0",
+    "bootstrap": "^3.3.6",    
+    "three.js": "^0.74.0",    
+    "seedrandom": "^2.4.2"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "nebula",
+  "version": "1.0.0",
+  "description": "A nebula generator",
+  "main": "nebula.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ssrb/nebula.git"
+  },
+  "keywords": [
+    "generative",
+    "art"
+  ],
+  "author": "ssrb",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/ssrb/nebula/issues"
+  },
+  "homepage": "https://github.com/ssrb/nebula#readme",
+  "dependencies": {
+    "brfs": "^1.4.3",
+    "browserify": "^13.0.0",
+    "gulp": "^3.9.1",
+    "gulp-bower": "0.0.13",
+    "gulp-peg": "^0.2.0",
+    "gulp-tsd": "^0.1.0",
+    "gulp-util": "^3.0.7",
+    "run-sequence": "^1.1.5",
+    "tsify": "^0.13.2",
+    "typescript-collections": "^1.1.2",
+    "uglifyify": "^3.0.1",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.7.0"
+  }
+}
