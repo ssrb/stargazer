@@ -33,7 +33,7 @@ gulp.task('.npm.clean', function (cb) {
 
 gulp.task('watch', function() {
     var bundler = watchify(browserify({debug: true})
-        .add('synthesizer.ts')
+        .add('nebula.ts')
         .plugin(tsify)
         .transform(browserifyShader));
 
@@ -48,24 +48,9 @@ gulp.task('watch', function() {
     return rebundle();
 });
 
-gulp.task('.peg', function() {
-    return gulp.src( "eisen-script.peg" )
-    .pipe( peg().on( "error", gutil.log ) )
-    .pipe( gulp.dest('.') )
-});
-
-gulp.task('.examples', function(cb) {
-    var exec = require('child_process').exec;
-    exec('./pack-examples.sh > examples-generated.ts', function (err, stdout, stderr) {
-    console.log(stdout);
-    console.log(stderr);
-    cb(err);
-    });
-});
-
-gulp.task('.ui', function() {
+gulp.task('.nebula', function() {
     var bundler = browserify({debug: true})
-        .add('./mega-structure.ts')
+        .add('./nebula.ts')
         .plugin(tsify)
         .transform('brfs')
     
@@ -74,20 +59,9 @@ gulp.task('.ui', function() {
         .pipe(gulp.dest('.'));
 });
 
-gulp.task('.synth', function() {
-    var bundler = browserify({debug: true})
-        .add('./synthesizer-webworker.ts')
-        .add('./node_modules/typescript-collections/collections.ts')
-        .plugin(tsify)
-    
-    return bundler.bundle()
-        .pipe(source('synthesizer-webworker.js'))
-        .pipe(gulp.dest('.'));
-});
-
-gulp.task('.ui.release', function() {
+gulp.task('.nebula.release', function() {
     var bundler = browserify()
-        .add('./mega-structure.ts')
+        .add('./nebula.ts')
         .plugin(tsify)
         .transform('brfs')
         .transform(uglify);
@@ -96,27 +70,11 @@ gulp.task('.ui.release', function() {
         .pipe(source('bundle.js'))
         .pipe(gulp.dest('.'));
 });
-
-gulp.task('.synth.release', function() {
-    var bundler = browserify()
-        .add('./synthesizer-webworker.ts')
-        .add('./node_modules/typescript-collections/collections.ts')
-        .plugin(tsify)
-        .transform(uglify);
-    
-    return bundler.bundle()
-        .pipe(source('synthesizer-webworker.js'))
-        .pipe(gulp.dest('.'));
-});
-
 
 gulp.task('default', function(callback) {
     runSequence('.bower.install',
                 '.tsd.install',
-                '.peg',
-                '.examples',
-                '.ui',
-                '.synth',
+                '.nebula',
                 callback);
 });
 
