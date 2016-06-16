@@ -27,4 +27,90 @@
 
 ///<reference path="typings/tsd.d.ts"/>
 
+var renderer: THREE.WebGLRenderer;
+var mesh: THREE.Mesh;
+var camera: THREE.PerspectiveCamera;
+var controls: THREE.OrbitControls;	
+
 var app: ng.IModule = angular.module('Nebula.App', []);
+
+window.onload = () => {
+
+	var view = document.getElementById("nebula-view");
+
+	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+	renderer.setPixelRatio(window.devicePixelRatio);
+
+	camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+	camera.position.z = 1.5;
+
+	function doResize(): void {
+		var w = view.offsetWidth, h = window.innerHeight - document.getElementById("header").offsetHeight;
+		w *= 0.95;
+		h *= 0.95;
+		renderer.setSize(w, h);
+		camera.aspect = w / h;
+		camera.updateProjectionMatrix();
+	}
+	doResize();
+	window.addEventListener('resize', doResize);
+
+	view.appendChild(renderer.domElement);
+
+	var scene = new THREE.Scene();
+
+	scene.add(camera);
+
+	var material =
+		new THREE.MeshPhongMaterial({
+			vertexColors: THREE.FaceColors,
+			side: THREE.DoubleSide,
+			shading: THREE.FlatShading
+		});
+
+	mesh = new THREE.Mesh(
+			new THREE.BoxGeometry(1, 1, 1),
+			material
+		);
+
+	scene.add(mesh);
+
+	var ambientLight = new THREE.AmbientLight(0x000000);
+	scene.add(ambientLight);
+
+	var lights = [];
+	lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+	lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+	lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+
+	lights[0].position.set(0, 200, 0);
+	lights[1].position.set(100, 200, 100);
+	lights[2].position.set(-100, -200, -100);
+
+	scene.add(lights[0]);
+	scene.add(lights[1]);
+	scene.add(lights[2]);
+	
+	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
+	controls.enableKeys = false;
+	controls.target.set(0, 0, 0);
+
+	var lastTime = new Date().getTime();
+	function animate() {
+
+		var timeNow = new Date().getTime();
+
+		var dt = (timeNow - lastTime) / (60 * 1000);
+		var dtheta = 2 * Math.PI * 1 * dt				
+		mesh.rotation.x += dtheta;
+		mesh.rotation.y += dtheta;
+		
+		renderer.render(scene, camera);
+
+		requestAnimationFrame(animate);
+
+		lastTime = timeNow;
+	}
+
+	animate();
+}
