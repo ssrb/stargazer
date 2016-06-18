@@ -1,5 +1,5 @@
 uniform sampler2D permTexture;
-uniform sampler1D gradTexture;
+uniform sampler2D gradTexture; // <- sampler1D
 uniform float ditherAmt;
 uniform float gain;
 uniform vec3 innerColor;
@@ -11,6 +11,7 @@ uniform float shelfAmt;
 uniform float noiseScale;
 
 varying vec3 vertexPos;
+
 vec3 fade(vec3 t)  
 {  
     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0); // new curve
@@ -23,7 +24,7 @@ vec4 perm2d(vec2 p)
    
 float gradperm(float x, vec3 p)  
 {  
-    vec3 v = texture1D(gradTexture, x).xyz;
+    vec3 v = texture2D(gradTexture, vec2(x, 0.5)).xyz; // <- texture1D
     v *= 2.0;
     v -= 1.0;    
     return dot(v, p);  
@@ -64,7 +65,12 @@ float fbmNoise(vec3 vIn, int octaves, float lacunarity, float gain)
     float amplitudeSum = 0.0;
     
     // make some fbm noise
-    for( int i = 0; i < octaves; i++) {
+    const int kMaxOctave = 2;
+    for( int i = 0; i < kMaxOctave; i++) {
+        // webgl workaround for non-const loop boundary
+        if (i >= octaves) {
+            break;
+        }
         noiseSum += perlinNoise(v) * amplitude;
         amplitudeSum += amplitude;
         amplitude *= gain;

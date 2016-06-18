@@ -27,6 +27,13 @@
 
 ///<reference path="typings/tsd.d.ts"/>
 
+// Browserify will bundle shaders and js all together for us.
+// In order to do so, the tool must find a 'require' with a string literal argument
+// to figure out what must be bundled together
+require('./shaders/noise.vs');
+require('./shaders/noise_fbm.fs');
+require('./shaders/noise_ridged.fs');
+
 var renderer: THREE.WebGLRenderer;
 var mesh: THREE.Mesh;
 var camera: THREE.PerspectiveCamera;
@@ -61,12 +68,48 @@ window.onload = () => {
 
 	scene.add(camera);
 
-	var material =
-		new THREE.MeshPhongMaterial({
-			vertexColors: THREE.FaceColors,
-			side: THREE.DoubleSide,
-			shading: THREE.FlatShading
-		});
+	
+	// var material =
+	// 	new THREE.MeshPhongMaterial({
+	// 		vertexColors: THREE.FaceColors,
+	// 		side: THREE.DoubleSide,
+	// 		shading: THREE.FlatShading
+	// 	});		
+
+	var permTexture = new THREE.DataTexture(
+		<any>new ArrayBuffer(256 * 256 * 4),
+		256,
+		256,
+		THREE.RGBAFormat,
+		THREE.UnsignedByteType, null, null, null, null, null /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+
+	var gradTexture = new THREE.DataTexture(
+		<any>new ArrayBuffer(256 * 1 * 3),
+		256,
+		1,
+		THREE.RGBFormat,
+		THREE.UnsignedByteType, null, null, null, null, null /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+
+	var material = new THREE.ShaderMaterial({
+
+		uniforms: {
+			permTexture: { value: permTexture, type: "t" },
+			gradTexture: { value: gradTexture, type: "t" },
+			ditherAmt: { value: 1.0, type: "f" },
+			gain: { value: 1.0, type: "f" },
+			innerColor: { value: new THREE.Vector3(0,0,0), type: "v3" },
+			lacunarity: { value: 1.0, type: "f" },
+			octaves: { value: 1.0, type: "i" },
+			outerColor: { value: new THREE.Vector3(0,0,0), type: "v3" },
+			powerAmt: { value: 1.0, type: "f" },
+			shelfAmt: { value: 0.0, type: "f" },
+			noiseScale: { value: 1.0, type: "f" }			
+		},
+		
+		vertexShader: require('./shaders/noise.vs')(),
+		fragmentShader: require('./shaders/noise_fbm.fs')()
+
+	});
 
 	mesh = new THREE.Mesh(
 			new THREE.BoxGeometry(1, 1, 1),

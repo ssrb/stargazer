@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 var browserify = require('browserify');
+var browserifyShader = require("browserify-shader")
 var watchify = require('watchify');
 var tsify = require('tsify');
 var uglify = require('uglifyify');
@@ -52,6 +53,7 @@ gulp.task('.nebula', function() {
     var bundler = browserify({debug: true})
         .add('./nebula.ts')
         .plugin(tsify)
+        .transform(browserifyShader)
         .transform('brfs')
     
     return bundler.bundle()
@@ -63,6 +65,7 @@ gulp.task('.nebula.release', function() {
     var bundler = browserify()
         .add('./nebula.ts')
         .plugin(tsify)
+        .transform(browserifyShader)
         .transform('brfs')
         .transform(uglify);
     
