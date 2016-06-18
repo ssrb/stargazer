@@ -95,15 +95,15 @@ window.onload = () => {
 		uniforms: {
 			permTexture: { value: permTexture, type: "t" },
 			gradTexture: { value: gradTexture, type: "t" },
-			ditherAmt: { value: 1.0, type: "f" },
-			gain: { value: 1.0, type: "f" },
-			innerColor: { value: new THREE.Vector3(0,0,0), type: "v3" },
+			ditherAmt: { value: 0.1, type: "f" },
+			gain: { value: 0.1, type: "f" },
+			innerColor: { value: new THREE.Vector3(19/255,34/255,1.0), type: "v3" },
 			lacunarity: { value: 1.0, type: "f" },
-			octaves: { value: 1.0, type: "i" },
+			octaves: { value: 2, type: "i" },
 			outerColor: { value: new THREE.Vector3(0,0,0), type: "v3" },
 			powerAmt: { value: 1.0, type: "f" },
 			shelfAmt: { value: 0.0, type: "f" },
-			noiseScale: { value: 1.0, type: "f" }			
+			noiseScale: { value: 10.0, type: "f" }			
 		},
 		
 		vertexShader: require('./shaders/noise.vs')(),
