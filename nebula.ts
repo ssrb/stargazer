@@ -68,14 +68,6 @@ window.onload = () => {
 
 	scene.add(camera);
 
-	
-	// var material =
-	// 	new THREE.MeshPhongMaterial({
-	// 		vertexColors: THREE.FaceColors,
-	// 		side: THREE.DoubleSide,
-	// 		shading: THREE.FlatShading
-	// 	});		
-
 	var permTexture = new THREE.DataTexture(
 		<any>new ArrayBuffer(256 * 256 * 4),
 		256,

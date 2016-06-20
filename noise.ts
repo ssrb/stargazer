@@ -25,53 +25,58 @@
 // of the authors and should not be interpreted as representing official policies,
 // either expressed or implied, of the FreeBSD Project.
 
-// static char grad3[16][3] = {
-//         {1, 1, 0 },    { -1, 1, 0 },    { 1, -1, 0 },    { -1, -1, 0 },
-// { 1, 0, 1 },    { -1, 0, 1 },    { 1, 0, -1 },    { -1, 0, -1 },
-// { 0, 1, 1 },    { 0, -1, 1 },    { 0, 1, -1 },    { 0, -1, -1 },
-// { 1, 1, 0 },    { 0, -1, 1 },    { -1, 1, 0 },    { 0, -1, -1 }
-// };
+///<reference path="typings/tsd.d.ts"/>
+var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
+
+var grad3: number[][] = [
+    [1, 1, 0 ], [ -1, 1, 0 ], [ 1, -1, 0 ], [ -1, -1, 0 ],
+	[ 1, 0, 1 ], [ -1, 0, 1 ], [ 1, 0, -1 ], [ -1, 0, -1 ],
+	[ 0, 1, 1 ], [ 0, -1, 1 ], [ 0, 1, -1 ], [ 0, -1, -1 ],
+	[ 1, 1, 0 ], [ 0, -1, 1 ], [ -1, 1, 0 ], [ 0, -1, -1 ]
+];
 
 
-// /*
-//  * Helper functions to compute gradients-dot-residualvectors (1D to 4D)
-//  * Note that these generate gradients of more than unit length. To make
-//  * a close match with the value range of classic Perlin noise, the final
-//  * noise values need to be rescaled to fit nicely within [-1,1].
-//  */
-// double SpacescapeLayer::grad(int hash, double x, double y , double z )
+/*
+ * Helper functions to compute gradients-dot-residualvectors (1D to 4D)
+ * Note that these generate gradients of more than unit length. To make
+ * a close match with the value range of classic Perlin noise, the final
+ * noise values need to be rescaled to fit nicely within [-1,1].
+ */
+function grad(hash : number, x : number, y : number, z : number) : number
+{
+    var h = hash & 15;     // Convert low 4 bits of hash code into 12 simple
+    var u = h < 8 ? x : y; // gradient directions, and compute dot product.
+    var v = h < 4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
+    return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
+}
+
+
+// function initNoise(seed : number): void
 // {
-//     int h = hash & 15;     // Convert low 4 bits of hash code into 12 simple
-//     double u = h < 8 ? x : y; // gradient directions, and compute dot product.
-//     double v = h < 4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
-//     return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
-// }
-
-
-// void SpacescapeLayer::initNoise(unsigned int seed)
-// {
+// 	var mPermutations : number[] = [];
+// 	var mGradients : number[] = [];
 //     // update the permutation table
 //     // thank you http://britonia-game.com/?p=60
-//     for (int i = 0; i < 256; i++) {
+//     for (var i = 0; i < 256; i++) {
 //         mPermutations[i] = i;
 //     }
 
-//     // seed the random number generator
-//     srand(seed);
-
+// 	// seed a random number generator
+// 	var rand = seedrandom(seed);
+    
 //     // randomize the permutation table
-//     for (int i = 0; i < 256; i++) {
+//     for (var i = 0; i < 256; i++) {
 //         // for each value swap with a random slot in the array 
-//         uchar swapIndex = rand() % 256;
+//         var swapIndex = rand() % 256;
 
-//         int oldVal = mPermutations[i];
+//         var oldVal = mPermutations[i];
 //         mPermutations[i] = mPermutations[swapIndex];
 //         mPermutations[swapIndex] = oldVal;
 //     }
 
-//     for (int i = 0; i < 256; i++) {
+//     for (var i = 0; i < 256; i++) {
 //         mPermutations[i + 256] = mPermutations[i];
-//         int h = mPermutations[i] & 15;
+//         var h = mPermutations[i] & 15;
 //         mGradients[i] = Vector3(grad3[h][0], grad3[h][1], grad3[h][2]).normalisedCopy();
 //         mGradients[i + 256] = mGradients[i];
 //     }
