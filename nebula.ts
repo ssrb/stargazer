@@ -27,6 +27,8 @@
 
 ///<reference path="typings/tsd.d.ts"/>
 
+import Noise = require('./noise');
+
 // Browserify will bundle shaders and js all together for us.
 // In order to do so, the tool must find a 'require' with a string literal argument
 // to figure out what must be bundled together
@@ -68,15 +70,17 @@ window.onload = () => {
 
 	scene.add(camera);
 
+	var noise = new Noise(0);
+
 	var permTexture = new THREE.DataTexture(
-		<any>new ArrayBuffer(256 * 256 * 4),
+		<any>new Uint8Array(noise.permutations),
 		256,
 		256,
 		THREE.RGBAFormat,
 		THREE.UnsignedByteType, null, null, null, null, null /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
 
 	var gradTexture = new THREE.DataTexture(
-		<any>new ArrayBuffer(256 * 1 * 3),
+		<any>new Uint8Array(noise.gradients),
 		256,
 		1,
 		THREE.RGBFormat,

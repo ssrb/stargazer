@@ -28,84 +28,68 @@
 ///<reference path="typings/tsd.d.ts"/>
 var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
-var grad3: number[][] = [
-    [1, 1, 0 ], [ -1, 1, 0 ], [ 1, -1, 0 ], [ -1, -1, 0 ],
-	[ 1, 0, 1 ], [ -1, 0, 1 ], [ 1, 0, -1 ], [ -1, 0, -1 ],
-	[ 0, 1, 1 ], [ 0, -1, 1 ], [ 0, 1, -1 ], [ 0, -1, -1 ],
-	[ 1, 1, 0 ], [ 0, -1, 1 ], [ -1, 1, 0 ], [ 0, -1, -1 ]
-];
+class Noise {
+   
+public constructor(seed: number)
+{	
+    var grad3: number[][] = [
+        [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
+        [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
+        [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1],
+        [1, 1, 0], [0, -1, 1], [-1, 1, 0], [0, -1, -1]
+    ];
 
+    
+    var perm = new Array<number>(256);
 
-/*
- * Helper functions to compute gradients-dot-residualvectors (1D to 4D)
- * Note that these generate gradients of more than unit length. To make
- * a close match with the value range of classic Perlin noise, the final
- * noise values need to be rescaled to fit nicely within [-1,1].
- */
-function grad(hash : number, x : number, y : number, z : number) : number
-{
-    var h = hash & 15;     // Convert low 4 bits of hash code into 12 simple
-    var u = h < 8 ? x : y; // gradient directions, and compute dot product.
-    var v = h < 4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
-    return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
+    for (var i = 0; i < 256; ++i) {
+        perm[i] = i;
+    }
+
+	var rand = seedrandom(seed);
+    
+    for (var i = 0; i < 256; ++i) {        
+        var swapIndex = Math.floor(rand() * 256);
+        var oldVal = perm[i];
+        perm[i] = perm[swapIndex];
+        perm[swapIndex] = oldVal;
+    }
+
+    this.permutations = new Array<number>(256 * 256 * 4);
+    var permutations = this.permutations;
+    for (var Y = 0, offset = 0; Y < 256; ++Y) {
+        for (var X = 0; X < 256; ++X, offset+=4) {            
+            var A = perm[X]; 
+            permutations[offset + 0] = perm[A + Y]; 
+            permutations[offset + 1] = perm[A + Y + 1];
+            var B = perm[X + 1]; // <===========================
+            permutations[offset + 2] = perm[B + Y]; 
+            permutations[offset + 3] = perm[B + Y + 1];            
+        }
+    }
+
+    this.gradients = new Array<number>(256 * 3);
+    var gradients = this.gradients;  
+    for (var i = 0, offset = 0; i < 256; ++i, offset += 3) {
+
+        var index = perm[i] & 15;
+
+        var v =  new THREE.Vector3(grad3[index][0], grad3[index][1], grad3[index][2]);
+        v.normalize();
+        v.multiplyScalar(0.5);
+        v.addScalar(0.5);
+
+        gradients[offset + 0] = Math.floor(v.x * 255.0);
+        gradients[offset + 1] = Math.floor(v.y * 255.0);
+        gradients[offset + 2] = Math.floor(v.z * 255.0);
+    }
+
 }
 
 
-// function initNoise(seed : number): void
-// {
-// 	var mPermutations : number[] = [];
-// 	var mGradients : number[] = [];
-//     // update the permutation table
-//     // thank you http://britonia-game.com/?p=60
-//     for (var i = 0; i < 256; i++) {
-//         mPermutations[i] = i;
-//     }
+public permutations: number[];
+public gradients: number[];
 
-// 	// seed a random number generator
-// 	var rand = seedrandom(seed);
-    
-//     // randomize the permutation table
-//     for (var i = 0; i < 256; i++) {
-//         // for each value swap with a random slot in the array 
-//         var swapIndex = rand() % 256;
+}
 
-//         var oldVal = mPermutations[i];
-//         mPermutations[i] = mPermutations[swapIndex];
-//         mPermutations[swapIndex] = oldVal;
-//     }
-
-//     for (var i = 0; i < 256; i++) {
-//         mPermutations[i + 256] = mPermutations[i];
-//         var h = mPermutations[i] & 15;
-//         mGradients[i] = Vector3(grad3[h][0], grad3[h][1], grad3[h][2]).normalisedCopy();
-//         mGradients[i + 256] = mGradients[i];
-//     }
-// }
-
-
-// // we add the Z part in the shader
-// for (int Y = 0; Y < 256; Y++) {
-//     for (int X = 0; X < 256; X++) {
-//         int offset = (Y * 256 + X) * 4;
-
-//         uchar A = mPermutations[X]; // A = mPermutations[X]+Y (add y later below)
-//         permTexture[offset + 0] = mPermutations[A + Y]; // AA = mPermutations[A]+Z (add z in shader)
-//         permTexture[offset + 1] = mPermutations[A + Y + 1]; // AB = mPermutations[A+1]+Z
-//         uchar B = mPermutations[X + 1]; // we add the y later
-//         permTexture[offset + 2] = mPermutations[B + Y]; // BA = mPermutations[B]+Z (add z in shader)
-//         permTexture[offset + 3] = mPermutations[B + Y + 1]; // BB = mPermutations[B+1]+Z (add z in shader)             
-//     }
-// }
-
-// for (int i = 0; i < 256; i++) {
-//     int offset = i * 3;
-//     int index = mPermutations[i] & 15;
-//     Vector3 v = Vector3(grad3[index][0], grad3[index][1], grad3[index][2]);
-//     v.normalise();
-//     v *= 0.5;
-//     v += 0.5;
-
-//     gradTexture[offset + 0] = floor(v.x * 255.0);
-//     gradTexture[offset + 1] = floor(v.y * 255.0);
-//     gradTexture[offset + 2] = floor(v.z * 255.0);
-// }
+export = Noise;
