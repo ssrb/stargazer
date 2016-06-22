@@ -40,7 +40,7 @@ public constructor(seed: number)
     ];
 
     
-    var perm = new Array<number>(256);
+    var perm = new Array<number>(512 + 1);
 
     for (var i = 0; i < 256; ++i) {
         perm[i] = i;
@@ -55,6 +55,12 @@ public constructor(seed: number)
         perm[swapIndex] = oldVal;
     }
 
+    for (var i = 0; i < 256; ++i) {
+        perm[256 + i] = perm[i];
+    }
+
+    perm[512] = perm[0];
+
     this.permutations = new Array<number>(256 * 256 * 4);
     var permutations = this.permutations;
     for (var Y = 0, offset = 0; Y < 256; ++Y) {
@@ -62,7 +68,7 @@ public constructor(seed: number)
             var A = perm[X]; 
             permutations[offset + 0] = perm[A + Y]; 
             permutations[offset + 1] = perm[A + Y + 1];
-            var B = perm[X + 1]; // <===========================
+            var B = perm[X + 1];
             permutations[offset + 2] = perm[B + Y]; 
             permutations[offset + 3] = perm[B + Y + 1];            
         }
@@ -79,9 +85,13 @@ public constructor(seed: number)
         v.multiplyScalar(0.5);
         v.addScalar(0.5);
 
-        gradients[offset + 0] = Math.floor(v.x * 255.0);
-        gradients[offset + 1] = Math.floor(v.y * 255.0);
-        gradients[offset + 2] = Math.floor(v.z * 255.0);
+        //gradients[offset + 0] = Math.floor(v.x * 255.0);
+        //gradients[offset + 1] = Math.floor(v.y * 255.0);
+        //gradients[offset + 2] = Math.floor(v.z * 255.0);
+
+        gradients[offset + 0] = v.x;
+        gradients[offset + 1] = v.y;
+        gradients[offset + 2] = v.z;
     }
 
 }
