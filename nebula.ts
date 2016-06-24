@@ -77,7 +77,13 @@ window.onload = () => {
 		256,
 		256,
 		THREE.RGBAFormat,
-		THREE.UnsignedByteType, undefined, THREE.RepeatWrapping, THREE.RepeatWrapping, undefined, undefined /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+		THREE.UnsignedByteType, 
+		undefined, 
+		THREE.RepeatWrapping,
+		THREE.RepeatWrapping,
+		undefined,
+		undefined
+	);
 	permTexture.needsUpdate = true;
 
 	var gradTexture = new THREE.DataTexture(
@@ -85,27 +91,54 @@ window.onload = () => {
 		256,
 		1,
 		THREE.RGBFormat,
-		THREE.UnsignedByteType, undefined, THREE.RepeatWrapping, THREE.RepeatWrapping, undefined, undefined /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+		THREE.UnsignedByteType, 
+		undefined, 
+		THREE.RepeatWrapping, 
+		THREE.RepeatWrapping,
+		undefined,
+		undefined
+	);
 	gradTexture.needsUpdate = true;
 
 	var material = new THREE.ShaderMaterial({
 
-		uniforms: {
-			permTexture: { value: permTexture},
-			gradTexture: { value: gradTexture},
-			ditherAmt: { value: 0.1},
-			gain: { value: 0.1},
-			innerColor: { value: new THREE.Vector3(19/255,34/255,1.0)},
-			lacunarity: { value: 1.0},
-			octaves: { value: 2},
-			outerColor: { value: new THREE.Vector3(0,0,0)},
-			powerAmt: { value: 1.0},
-			shelfAmt: { value: 0.0},
-			noiseScale: { value: 10.0}
-		},
+		// fbm
+		// uniforms: {
+		// 	permTexture: { value: permTexture},
+		// 	gradTexture: { value: gradTexture},
+		// 	ditherAmt: { value: 0.1},
+		// 	gain: { value: 0.1},
+		// 	innerColor: { value: new THREE.Vector3(19/255,34/255,1.0)},
+		// 	lacunarity: { value: 1.0},
+		// 	octaves: { value: 2},
+		// 	outerColor: { value: new THREE.Vector3(0,0,0)},
+		// 	powerAmt: { value: 1.0},
+		// 	shelfAmt: { value: 0.0},
+		// 	noiseScale: { value: 10.0}
+		// },
 		
+		// ridged
+		uniforms: {
+			permTexture: { value: permTexture },
+			gradTexture: { value: gradTexture },
+			ditherAmt: { value: 0.1 },
+			gain: { value: 0.1 },
+			innerColor: { value: new THREE.Vector3(19 / 255, 34 / 255, 1.0) },
+			lacunarity: { value: 1.0 },
+			offset: {value: 0.0},
+			octaves: { value: 2 },
+			outerColor: { value: new THREE.Vector3(0, 0, 0) },
+			powerAmt: { value: 1.0 },
+			shelfAmt: { value: 0.0 },
+			noiseScale: { value: 10.0 }
+		},
+
 		vertexShader: require('./shaders/noise.vs')(),
-		fragmentShader: require('./shaders/noise_fbm.fs')()
+		// fbm
+		//fragmentShader: require('./shaders/noise_fbm.fs')()
+
+		// ridged
+		fragmentShader: require('./shaders/noise_ridged.fs')()
 
 	});
 

@@ -1,5 +1,5 @@
 uniform sampler2D permTexture;
-uniform sampler1D gradTexture;
+uniform sampler2D gradTexture; // <- sampler1D
 uniform float ditherAmt;
 uniform float gain;
 uniform vec3 innerColor;
@@ -24,7 +24,7 @@ return texture2D(permTexture, p);
 
 float gradperm(float x, vec3 p)  
 {  
-vec3 v = texture1D(gradTexture, x).xyz;
+vec3 v = texture2D(gradTexture, vec2(x, 0.5)).xyz;
 v *= 2.0;
 v -= 1.0;    
 return dot(v, p);  
@@ -58,8 +58,8 @@ vec4 AA = perm2d(P.xy) + P.z;
 */
 float ridge(float noiseVal, float offset)
 {
-float newVal = offset - abs(noiseVal);
-return newVal * newVal;
+  float newVal = offset - abs(noiseVal);
+  return newVal * newVal;
 }
 
 /*
@@ -76,7 +76,12 @@ float prev = 1.0;
 float n;
 
 // make some ridged fbm noise
-for( int i = 0; i < octaves; i++) {
+const int kMaxOctave = 5;
+for( int i = 0; i < kMaxOctave; i++) {
+    // webgl workaround for non-const loop boundary
+    if (i >= octaves) {
+        break;
+    }
     n = ridge(perlinNoise(v), offset);
     noiseSum += n * amplitude * prev;
     prev = n;
