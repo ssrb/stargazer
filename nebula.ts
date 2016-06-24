@@ -77,7 +77,7 @@ window.onload = () => {
 		256,
 		256,
 		THREE.RGBAFormat,
-		THREE.UnsignedByteType, undefined, undefined, undefined, undefined, undefined /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+		THREE.UnsignedByteType, undefined, THREE.RepeatWrapping, THREE.RepeatWrapping, undefined, undefined /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
 	permTexture.needsUpdate = true;
 
 	var gradTexture = new THREE.DataTexture(
@@ -85,7 +85,7 @@ window.onload = () => {
 		256,
 		1,
 		THREE.RGBFormat,
-		THREE.UnsignedByteType, undefined, undefined, undefined, undefined, undefined /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+		THREE.UnsignedByteType, undefined, THREE.RepeatWrapping, THREE.RepeatWrapping, undefined, undefined /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
 	gradTexture.needsUpdate = true;
 
 	var material = new THREE.ShaderMaterial({
