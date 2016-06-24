@@ -41,6 +41,8 @@ var mesh: THREE.Mesh;
 var camera: THREE.PerspectiveCamera;
 var controls: THREE.OrbitControls;	
 
+var noise = new Noise(0);
+
 var app: ng.IModule = angular.module('Nebula.App', []);
 
 window.onload = () => {
@@ -70,36 +72,36 @@ window.onload = () => {
 
 	scene.add(camera);
 
-	var noise = new Noise(0);
-
 	var permTexture = new THREE.DataTexture(
-		<any>new Uint8Array(noise.permutations),
+		<any>noise.permutations,
 		256,
 		256,
 		THREE.RGBAFormat,
-		THREE.UnsignedByteType, null, null, null, null, null /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+		THREE.UnsignedByteType, undefined, undefined, undefined, undefined, undefined /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+	permTexture.needsUpdate = true;
 
 	var gradTexture = new THREE.DataTexture(
-		<any>new Uint8Array(noise.gradients),
+		<any>noise.gradients,
 		256,
 		1,
 		THREE.RGBFormat,
-		THREE.UnsignedByteType, null, null, null, null, null /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+		THREE.UnsignedByteType, undefined, undefined, undefined, undefined, undefined /*, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy*/);
+	gradTexture.needsUpdate = true;
 
 	var material = new THREE.ShaderMaterial({
 
 		uniforms: {
-			permTexture: { value: permTexture, type: "t" },
-			gradTexture: { value: gradTexture, type: "t" },
-			ditherAmt: { value: 0.1, type: "f" },
-			gain: { value: 0.1, type: "f" },
-			innerColor: { value: new THREE.Vector3(19/255,34/255,1.0), type: "v3" },
-			lacunarity: { value: 1.0, type: "f" },
-			octaves: { value: 2, type: "i" },
-			outerColor: { value: new THREE.Vector3(0,0,0), type: "v3" },
-			powerAmt: { value: 1.0, type: "f" },
-			shelfAmt: { value: 0.0, type: "f" },
-			noiseScale: { value: 10.0, type: "f" }			
+			permTexture: { value: permTexture},
+			gradTexture: { value: gradTexture},
+			ditherAmt: { value: 0.1},
+			gain: { value: 0.1},
+			innerColor: { value: new THREE.Vector3(19/255,34/255,1.0)},
+			lacunarity: { value: 1.0},
+			octaves: { value: 2},
+			outerColor: { value: new THREE.Vector3(0,0,0)},
+			powerAmt: { value: 1.0},
+			shelfAmt: { value: 0.0},
+			noiseScale: { value: 10.0}
 		},
 		
 		vertexShader: require('./shaders/noise.vs')(),

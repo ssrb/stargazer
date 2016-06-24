@@ -61,7 +61,7 @@ public constructor(seed: number)
 
     perm[512] = perm[0];
 
-    this.permutations = new Array<number>(256 * 256 * 4);
+    this.permutations = new Uint8Array(256 * 256 * 4);
     var permutations = this.permutations;
     for (var Y = 0, offset = 0; Y < 256; ++Y) {
         for (var X = 0; X < 256; ++X, offset+=4) {            
@@ -74,7 +74,7 @@ public constructor(seed: number)
         }
     }
 
-    this.gradients = new Array<number>(256 * 3);
+    this.gradients = new Uint8Array(256 * 3);
     var gradients = this.gradients;  
     for (var i = 0, offset = 0; i < 256; ++i, offset += 3) {
 
@@ -85,20 +85,16 @@ public constructor(seed: number)
         v.multiplyScalar(0.5);
         v.addScalar(0.5);
 
-        //gradients[offset + 0] = Math.floor(v.x * 255.0);
-        //gradients[offset + 1] = Math.floor(v.y * 255.0);
-        //gradients[offset + 2] = Math.floor(v.z * 255.0);
-
-        gradients[offset + 0] = v.x;
-        gradients[offset + 1] = v.y;
-        gradients[offset + 2] = v.z;
+        gradients[offset + 0] = Math.floor(v.x * 255.0);
+        gradients[offset + 1] = Math.floor(v.y * 255.0);
+        gradients[offset + 2] = Math.floor(v.z * 255.0);        
     }
 
 }
 
 
-public permutations: number[];
-public gradients: number[];
+public permutations: Uint8Array;
+public gradients: Uint8Array;
 
 }
 
