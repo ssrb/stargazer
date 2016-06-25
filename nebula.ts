@@ -52,7 +52,7 @@ window.onload = () => {
 	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 	renderer.setPixelRatio(window.devicePixelRatio);
 
-	camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+	camera = new THREE.PerspectiveCamera(35, 1, 0.1, 10000);
 	camera.position.z = 1.5;
 
 	function doResize(): void {
@@ -103,48 +103,48 @@ window.onload = () => {
 	var material = new THREE.ShaderMaterial({
 
 		// fbm
-		// uniforms: {
-		// 	permTexture: { value: permTexture},
-		// 	gradTexture: { value: gradTexture},
-		// 	ditherAmt: { value: 0.1},
-		// 	gain: { value: 0.1},
-		// 	innerColor: { value: new THREE.Vector3(19/255,34/255,1.0)},
-		// 	lacunarity: { value: 1.0},
-		// 	octaves: { value: 2},
-		// 	outerColor: { value: new THREE.Vector3(0,0,0)},
-		// 	powerAmt: { value: 1.0},
-		// 	shelfAmt: { value: 0.0},
-		// 	noiseScale: { value: 10.0}
-		// },
+		uniforms: {
+			permTexture: { value: permTexture},
+			gradTexture: { value: gradTexture},
+			ditherAmt: { value: 0.1},
+			gain: { value: 0.5},
+			innerColor: { value: new THREE.Vector3(249/255, 52/255, 1.0)},
+			lacunarity: { value: 2.0},
+			octaves: { value: 3},
+			outerColor: { value: new THREE.Vector3(8 / 255, 27 / 255, 89 / 255) },
+			powerAmt: { value: 1.0},
+			shelfAmt: { value: 0.0},
+			noiseScale: { value: 2.0}
+		},
 		
 		// ridged
-		uniforms: {
-			permTexture: { value: permTexture },
-			gradTexture: { value: gradTexture },
-			ditherAmt: { value: 0.1 },
-			gain: { value: 0.1 },
-			innerColor: { value: new THREE.Vector3(19 / 255, 34 / 255, 1.0) },
-			lacunarity: { value: 1.0 },
-			offset: {value: 0.0},
-			octaves: { value: 2 },
-			outerColor: { value: new THREE.Vector3(0, 0, 0) },
-			powerAmt: { value: 1.0 },
-			shelfAmt: { value: 0.0 },
-			noiseScale: { value: 10.0 }
-		},
+		// uniforms: {
+		// 	permTexture: { value: permTexture },
+		// 	gradTexture: { value: gradTexture },
+		// 	ditherAmt: { value: 0.1 },
+		// 	gain: { value: 0.1 },
+		// 	innerColor: { value: new THREE.Vector3(19 / 255, 34 / 255, 1.0) },
+		// 	lacunarity: { value: 1.0 },
+		// 	offset: {value: 0.0},
+		// 	octaves: { value: 2 },
+		// 	outerColor: { value: new THREE.Vector3(0, 0, 0) },
+		// 	powerAmt: { value: 1.0 },
+		// 	shelfAmt: { value: 0.0 },
+		// 	noiseScale: { value: 10.0 }
+		// },
 
 		vertexShader: require('./shaders/noise.vs')(),
 		// fbm
-		//fragmentShader: require('./shaders/noise_fbm.fs')()
-
+		fragmentShader: require('./shaders/noise_fbm.fs')(),		
 		// ridged
-		fragmentShader: require('./shaders/noise_ridged.fs')()
+		//fragmentShader: require('./shaders/noise_ridged.fs')()
 
+		side: THREE.BackSide,		
 	});
 
 	mesh = new THREE.Mesh(
-			new THREE.BoxGeometry(1, 1, 1),
-			material
+		new THREE.SphereGeometry(1, 16, 16),
+		material
 		);
 
 	scene.add(mesh);
@@ -166,8 +166,11 @@ window.onload = () => {
 	scene.add(lights[2]);
 	
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
+	controls.enablePan = controls.enableZoom = false;
 	controls.enableKeys = false;
 	controls.target.set(0, 0, 0);
+
+	renderer.setClearColor(new THREE.Color("black"));
 
 	var lastTime = new Date().getTime();
 	function animate() {
@@ -175,7 +178,7 @@ window.onload = () => {
 		var timeNow = new Date().getTime();
 
 		var dt = (timeNow - lastTime) / (60 * 1000);
-		var dtheta = 2 * Math.PI * 1 * dt				
+		var dtheta = 2 * Math.PI * 0.5 * dt				
 		mesh.rotation.x += dtheta;
 		mesh.rotation.y += dtheta;
 		
