@@ -37,11 +37,10 @@ require('./shaders/noise_fbm.fs');
 require('./shaders/noise_ridged.fs');
 
 var renderer: THREE.WebGLRenderer;
-var mesh: THREE.Mesh;
+var mesh1: THREE.Mesh;
+var mesh2: THREE.Mesh;
 var camera: THREE.PerspectiveCamera;
 var controls: THREE.OrbitControls;	
-
-var noise = new Noise(0);
 
 var app: ng.IModule = angular.module('Nebula.App', []);
 
@@ -49,7 +48,7 @@ window.onload = () => {
 
 	var view = document.getElementById("nebula-view");
 
-	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false});
 	renderer.setPixelRatio(window.devicePixelRatio);
 
 	camera = new THREE.PerspectiveCamera(30, 1, 0.1, 10000);
@@ -72,8 +71,10 @@ window.onload = () => {
 
 	scene.add(camera);
 
-	var permTexture = new THREE.DataTexture(
-		<any>noise.permutations,
+	var noise1 = new Noise(0);
+
+	var permTexture1 = new THREE.DataTexture(
+		<any>noise1.permutations,
 		256,
 		256,
 		THREE.RGBAFormat,
@@ -84,12 +85,13 @@ window.onload = () => {
 		THREE.LinearFilter,
 		THREE.LinearFilter
 	);
-	permTexture.anisotropy = 1.0;
-	permTexture.needsUpdate = true;
-	permTexture.generateMipmaps = false;
+	permTexture1.anisotropy = 1.0;
+	permTexture1.needsUpdate = true;
+	permTexture1.generateMipmaps = false;
+	permTexture1.premultiplyAlpha = false;
 
-	var gradTexture = new THREE.DataTexture(
-		<any>noise.gradients,
+	var gradTexture1 = new THREE.DataTexture(
+		<any>noise1.gradients,
 		256,
 		1,
 		THREE.RGBFormat,
@@ -100,59 +102,125 @@ window.onload = () => {
 		THREE.LinearFilter,
 		THREE.LinearFilter
 	);
-	gradTexture.anisotropy = 1.0;
-	gradTexture.needsUpdate = true;
-	gradTexture.generateMipmaps = false;
+	gradTexture1.anisotropy = 1.0;
+	gradTexture1.needsUpdate = true;
+	gradTexture1.generateMipmaps = false;
 
-	var material = new THREE.ShaderMaterial({
+	var material1 = new THREE.ShaderMaterial({
 
 		// fbm
 		uniforms: {
-			permTexture: { value: permTexture},
-			gradTexture: { value: gradTexture},
-			ditherAmt: { value: 1},
+			permTexture: { value: permTexture1},
+			gradTexture: { value: gradTexture1},
+			ditherAmt: { value: 0.03},
 			gain: { value: 0.5},
-			innerColor: { value: new THREE.Vector3(249/255, 52/255, 1.0)},
+			innerColor: { value: new THREE.Vector3(255/255, 0/255, 153/255)},
 			lacunarity: { value: 2.0},
-			octaves: { value: 3},
-			outerColor: { value: new THREE.Vector3(8 / 255, 27 / 255, 89 / 255) },
+			octaves: { value: 8},
+			outerColor: { value: new THREE.Vector3(1 / 255, 79 / 255, 91 / 255) },
 			powerAmt: { value: 1.0},
 			shelfAmt: { value: 0.0},
-			noiseScale: { value: 2.0}
+			noiseScale: { value: 1.0}			
 		},
 		
-		// ridged
-		// uniforms: {
-		// 	permTexture: { value: permTexture },
-		// 	gradTexture: { value: gradTexture },
-		// 	ditherAmt: { value: 0.1 },
-		// 	gain: { value: 0.1 },
-		// 	innerColor: { value: new THREE.Vector3(19 / 255, 34 / 255, 1.0) },
-		// 	lacunarity: { value: 1.0 },
-		// 	offset: {value: 0.0},
-		// 	octaves: { value: 2 },
-		// 	outerColor: { value: new THREE.Vector3(0, 0, 0) },
-		// 	powerAmt: { value: 1.0 },
-		// 	shelfAmt: { value: 0.0 },
-		// 	noiseScale: { value: 10.0 }
-		// },
-
 		vertexShader: require('./shaders/noise.vs')(),
 		// fbm
 		fragmentShader: require('./shaders/noise_fbm.fs')(),		
-		// ridged
-		//fragmentShader: require('./shaders/noise_ridged.fs')()
 
-		side: THREE.BackSide,		
 	});
+	material1.transparent = false;
+	material1.side = THREE.BackSide;	
+	material1.blendSrc = THREE.OneFactor;
+	material1.blendDst = <any>THREE.OneFactor;
+	material1.blending = THREE.NormalBlending;
 
-	mesh = new THREE.Mesh(
+	mesh1 = new THREE.Mesh(
 		new THREE.SphereGeometry(1, 16, 16),
-		material
-		);
+		material1
+	);
 
-	scene.add(mesh);
+	
 
+
+
+
+
+	var noise2 = new Noise(1);
+
+	var permTexture2 = new THREE.DataTexture(
+		<any>noise2.permutations,
+		256,
+		256,
+		THREE.RGBAFormat,
+		THREE.UnsignedByteType, 
+		THREE.UVMapping, 
+		THREE.RepeatWrapping,
+		THREE.RepeatWrapping,
+		THREE.LinearFilter,
+		THREE.LinearFilter
+	);
+	permTexture2.anisotropy = 1.0;
+	permTexture2.needsUpdate = true;
+	permTexture2.generateMipmaps = false;
+
+	var gradTexture2 = new THREE.DataTexture(
+		<any>noise2.gradients,
+		256,
+		1,
+		THREE.RGBFormat,
+		THREE.UnsignedByteType, 
+		THREE.UVMapping, 
+		THREE.RepeatWrapping, 
+		THREE.RepeatWrapping,
+		THREE.LinearFilter,
+		THREE.LinearFilter
+	);
+	gradTexture2.anisotropy = 1.0;
+	gradTexture2.needsUpdate = true;
+	gradTexture2.generateMipmaps = false;
+
+	var material2 = new THREE.ShaderMaterial({
+
+		// ridged
+		uniforms: {
+			permTexture: { value: permTexture2 },
+			gradTexture: { value: gradTexture2 },
+			ditherAmt: { value: 0.03 },
+			gain: { value: 0.5 },
+			innerColor: { value: new THREE.Vector3(0.0, 0.0, 0.0) },
+			lacunarity: { value: 2.0 },
+			offset: {value: 1.0},
+			octaves: { value: 7 },
+			outerColor: { value: new THREE.Vector3(0.0, 0.0, 0.0) },
+			powerAmt: { value: 1.0 },
+			shelfAmt: { value: 0.0 },
+			noiseScale: { value: 1.0 }
+		},
+
+		vertexShader: require('./shaders/noise.vs')(),
+		fragmentShader: require('./shaders/noise_ridged.fs')()
+	});
+	material2.transparent = true;
+	material2.side = THREE.BackSide;		
+	material2.blendSrc = <any>THREE.SrcAlphaFactor;
+	material2.blendDst = <any>THREE.OneMinusSrcAlphaFactor;
+	material2.blending = THREE.NormalBlending;
+
+	mesh2 = new THREE.Mesh(
+		new THREE.SphereGeometry(1, 16, 16),
+		material2
+	);
+	
+
+
+	scene.add(mesh1);
+	scene.add(mesh2);
+	
+	
+	
+
+	
+		
 	var ambientLight = new THREE.AmbientLight(0x000000);
 	scene.add(ambientLight);
 
@@ -170,11 +238,11 @@ window.onload = () => {
 	scene.add(lights[2]);
 	
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
-	controls.enablePan = controls.enableZoom = false;
+	//controls.enablePan = controls.enableZoom = false;
 	controls.enableKeys = false;
 	controls.target.set(0, 0, 0);
 
-	renderer.setClearColor(new THREE.Color("black"));
+	renderer.setClearColor(new THREE.Color("black"), 0.0);
 
 	var lastTime = new Date().getTime();
 	function animate() {
