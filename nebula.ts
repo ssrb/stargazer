@@ -52,7 +52,7 @@ window.onload = () => {
 	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 	renderer.setPixelRatio(window.devicePixelRatio);
 
-	camera = new THREE.PerspectiveCamera(35, 1, 0.1, 10000);
+	camera = new THREE.PerspectiveCamera(30, 1, 0.1, 10000);
 	camera.position.z = 1.5;
 
 	function doResize(): void {
@@ -78,13 +78,15 @@ window.onload = () => {
 		256,
 		THREE.RGBAFormat,
 		THREE.UnsignedByteType, 
-		undefined, 
+		THREE.UVMapping, 
 		THREE.RepeatWrapping,
 		THREE.RepeatWrapping,
-		undefined,
-		undefined
+		THREE.LinearFilter,
+		THREE.LinearFilter
 	);
+	permTexture.anisotropy = 1.0;
 	permTexture.needsUpdate = true;
+	permTexture.generateMipmaps = false;
 
 	var gradTexture = new THREE.DataTexture(
 		<any>noise.gradients,
@@ -92,13 +94,15 @@ window.onload = () => {
 		1,
 		THREE.RGBFormat,
 		THREE.UnsignedByteType, 
-		undefined, 
+		THREE.UVMapping, 
 		THREE.RepeatWrapping, 
 		THREE.RepeatWrapping,
-		undefined,
-		undefined
+		THREE.LinearFilter,
+		THREE.LinearFilter
 	);
+	gradTexture.anisotropy = 1.0;
 	gradTexture.needsUpdate = true;
+	gradTexture.generateMipmaps = false;
 
 	var material = new THREE.ShaderMaterial({
 
@@ -106,7 +110,7 @@ window.onload = () => {
 		uniforms: {
 			permTexture: { value: permTexture},
 			gradTexture: { value: gradTexture},
-			ditherAmt: { value: 0.1},
+			ditherAmt: { value: 1},
 			gain: { value: 0.5},
 			innerColor: { value: new THREE.Vector3(249/255, 52/255, 1.0)},
 			lacunarity: { value: 2.0},
@@ -179,8 +183,8 @@ window.onload = () => {
 
 		var dt = (timeNow - lastTime) / (60 * 1000);
 		var dtheta = 2 * Math.PI * 0.5 * dt				
-		mesh.rotation.x += dtheta;
-		mesh.rotation.y += dtheta;
+		//mesh.rotation.x += dtheta;
+		//mesh.rotation.y += dtheta;
 		
 		renderer.render(scene, camera);
 
