@@ -65,7 +65,7 @@ float fbmNoise(vec3 vIn, int octaves, float lacunarity, float gain)
     float amplitudeSum = 0.0;
     
     // make some fbm noise
-    const int kMaxOctave = 2;
+    const int kMaxOctave = 20;
     for( int i = 0; i < kMaxOctave; i++) {
         // webgl workaround for non-const loop boundary
         if (i >= octaves) {
@@ -101,6 +101,6 @@ void main( void )
     // apply optional power function
     noiseSum = pow(noiseSum,1.0/powerAmt);
 
-    gl_FragColor.xyz = mix(outerColor, innerColor, noiseSum);
-    gl_FragColor.w = noiseSum;
+    gl_FragColor.rgb = mix(outerColor, innerColor, noiseSum);
+    gl_FragColor.a = noiseSum;
 }

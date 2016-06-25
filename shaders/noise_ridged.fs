@@ -76,7 +76,7 @@ float prev = 1.0;
 float n;
 
 // make some ridged fbm noise
-const int kMaxOctave = 5;
+const int kMaxOctave = 20;
 for( int i = 0; i < kMaxOctave; i++) {
     // webgl workaround for non-const loop boundary
     if (i >= octaves) {
@@ -113,6 +113,6 @@ noiseSum *= 1.0/(1.0-shelfAmt);
 // apply optional power function
 noiseSum = pow(noiseSum,1.0/powerAmt);
 
-gl_FragColor.xyz = mix(outerColor, innerColor, noiseSum);
-gl_FragColor.w = noiseSum;
+gl_FragColor.rgb = mix(outerColor, innerColor, noiseSum);
+gl_FragColor.a = noiseSum;
 }
