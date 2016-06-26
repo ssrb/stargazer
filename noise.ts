@@ -87,7 +87,7 @@ public constructor(seed: number)
 
         gradients[offset + 0] = Math.floor(v.x * 255.0);
         gradients[offset + 1] = Math.floor(v.y * 255.0);
-        gradients[offset + 2] = Math.floor(v.z * 255.0);        
+        gradients[offset + 2] = Math.floor(v.z * 255.0);
     }
 
 }
