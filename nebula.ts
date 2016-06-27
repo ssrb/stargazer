@@ -27,6 +27,8 @@
 
 ///<reference path="typings/tsd.d.ts"/>
 
+var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
+
 import Noise = require('./noise');
 import Points = require('./points');
 
@@ -223,6 +225,26 @@ window.onload = () => {
 	scene.add(backgorund);
 	scene.add(mesh1);
 	scene.add(mesh2);
+
+
+	var geometry = new THREE.Geometry();
+
+
+	var mNumPoints = 10;
+	var rand = seedrandom(132);
+	for(var i = 0; i < mNumPoints; ++i) {
+	            // nicer distribution
+	            var u = -1.0 + 2.0 * rand();
+	            var a = 2 * Math.PI * rand();
+	            var s = Math.sqrt(1 - u*u);
+
+	            geometry.vertices.push(
+					new THREE.Vector3( s * Math.cos(a),  s * Math.sin(a), u )
+				);
+	        }
+	
+
+	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial() ));
 	
 	
 	
