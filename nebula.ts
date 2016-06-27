@@ -28,6 +28,7 @@
 ///<reference path="typings/tsd.d.ts"/>
 
 import Noise = require('./noise');
+import Points = require('./points');
 
 // Browserify will bundle shaders and js all together for us.
 // In order to do so, the tool must find a 'require' with a string literal argument
@@ -128,14 +129,14 @@ window.onload = () => {
 		fragmentShader: require('./shaders/noise_fbm.fs')(),		
 
 	});
-	material1.transparent = false;
+	material1.transparent = true;
 	material1.side = THREE.BackSide;	
 	material1.blendSrc = THREE.OneFactor;
-	material1.blendDst = <any>THREE.OneFactor;
+	material1.blendDst = <any>THREE.ZeroFactor;
 	material1.blending = THREE.NormalBlending;
 
 	mesh1 = new THREE.Mesh(
-		new THREE.SphereGeometry(1, 16, 16),
+		new THREE.SphereGeometry(1, 64, 64),
 		material1
 	);
 
@@ -207,12 +208,19 @@ window.onload = () => {
 	material2.blending = THREE.NormalBlending;
 
 	mesh2 = new THREE.Mesh(
-		new THREE.SphereGeometry(1, 16, 16),
+		new THREE.SphereGeometry(1, 64, 64),
 		material2
 	);
 	
 
+	var backgorund = new THREE.Mesh(
+		new THREE.SphereGeometry(1.5, 64, 64),
+		new THREE.MeshPhongMaterial({
+			color: "white",
+			side: THREE.BackSide, transparent : false})
+	);
 
+	scene.add(backgorund);
 	scene.add(mesh1);
 	scene.add(mesh2);
 	
@@ -242,7 +250,7 @@ window.onload = () => {
 	controls.enableKeys = false;
 	controls.target.set(0, 0, 0);
 
-	renderer.setClearColor(new THREE.Color("black"), 0.0);
+	renderer.setClearColor(new THREE.Color("white"), 1.0);
 
 	var lastTime = new Date().getTime();
 	function animate() {
