@@ -141,13 +141,7 @@ window.onload = () => {
 		new THREE.SphereGeometry(1, 64, 64),
 		material1
 	);
-
 	
-
-
-
-
-
 	var noise2 = new Noise(1);
 
 	var permTexture2 = new THREE.DataTexture(
@@ -230,46 +224,141 @@ window.onload = () => {
 	var geometry = new THREE.Geometry();
 
 
-	var mNumPoints = 10;
+	var mNumPoints = 1000;
 	var rand = seedrandom(132);
+	var radius = 0.999;
+
+	var far = new THREE.Color("white"), near = new THREE.Color("blue");
+
 	for(var i = 0; i < mNumPoints; ++i) {
-	            // nicer distribution
-	            var u = -1.0 + 2.0 * rand();
-	            var a = 2 * Math.PI * rand();
-	            var s = Math.sqrt(1 - u*u);
+        // nicer distribution
+        var u = -1.0 + 2.0 * rand();
+        var a = 2 * Math.PI * rand();
+        var s = Math.sqrt(1 - u*u);
+        
+        geometry.vertices.push(
+			new THREE.Vector3( radius * s * Math.cos(a),  radius * s * Math.sin(a), radius * u )
+		);
 
-	            geometry.vertices.push(
-					new THREE.Vector3( s * Math.cos(a),  s * Math.sin(a), u )
-				);
-	        }
+		geometry.colors.push(
+			far.clone().lerp(near, rand())
+		);
+    }
 	
 
-	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial() ));
-	
-	
-	
 
-	
+	var maskMaterial = new THREE.ShaderMaterial({
+
+		// fbm
+		uniforms: {
+			permTexture: { value: permTexture1},
+			gradTexture: { value: gradTexture1},
+			ditherAmt: { value: 0.03},
+			gain: { value: 0.5},
+			innerColor: { value: new THREE.Vector3(255/255, 0/255, 153/255)},
+			lacunarity: { value: 2.0},
+			octaves: { value: 8},
+			outerColor: { value: new THREE.Vector3(1 / 255, 79 / 255, 91 / 255) },
+			powerAmt: { value: 1.0},
+			shelfAmt: { value: 0.0},
+			noiseScale: { value: 1.0}			
+		},
 		
-	var ambientLight = new THREE.AmbientLight(0x000000);
-	scene.add(ambientLight);
+		vertexShader: require('./shaders/noise.vs')(),
+		// fbm
+		fragmentShader: require('./shaders/noise_fbm.fs')(),		
 
-	var lights = [];
-	lights[0] = new THREE.PointLight(0xffffff, 1, 0);
-	lights[1] = new THREE.PointLight(0xffffff, 1, 0);
-	lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+	});
+	maskMaterial.side = THREE.BackSide;	
 
-	lights[0].position.set(0, 200, 0);
-	lights[1].position.set(100, 200, 100);
-	lights[2].position.set(-100, -200, -100);
 
-	scene.add(lights[0]);
-	scene.add(lights[1]);
-	scene.add(lights[2]);
-	
+	var maskScene = new THREE.Scene();
+	maskScene.add(new THREE.Mesh(
+		new THREE.SphereGeometry(1, 64, 64),
+		maskMaterial
+	));
+
+	var cubeCamera = new THREE.CubeCamera( 0.1, 100000, 512);
+	maskScene.add( cubeCamera );
+
+
+// var gl = renderer.getContext();
+// var framebuffer = renderTarget.__webglFramebuffer;
+// gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+// var data = new Uint8Array(renderTarget.width * renderTarget.height * 4);
+// gl.readPixels(0,0,renderTarget.width,renderTarget.heigh,gl.RGBA,gl.UNSIGNED_BYTE,data);
+
+	// var framebuffer = properties.get( renderTarget ).__webglFramebuffer;
+
+	// 	if ( framebuffer ) {
+
+	// 		var restore = false;
+
+	// 		if ( framebuffer !== _currentFramebuffer ) {
+
+	// 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+	// 			restore = true;
+
+	// 		}
+
+	// 		try {
+
+	// 			var texture = renderTarget.texture;
+
+	// 			if ( texture.format !== THREE.RGBAFormat && paramThreeToGL( texture.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+
+	// 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
+	// 				return;
+
+	// 			}
+
+	// 			if ( texture.type !== THREE.UnsignedByteType &&
+	// 			     paramThreeToGL( texture.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) &&
+	// 			     ! ( texture.type === THREE.FloatType && extensions.get( 'WEBGL_color_buffer_float' ) ) &&
+	// 			     ! ( texture.type === THREE.HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
+
+	// 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
+	// 				return;
+
+	// 			}
+
+	// 			if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
+
+	// 				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
+
+	// 				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
+
+	// 					_gl.readPixels( x, y, width, height, paramThreeToGL( texture.format ), paramThreeToGL( texture.type ), buffer );
+
+	// 				}
+
+	// 			} else {
+
+	// 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
+
+	// 			}
+
+	// 		} finally {
+
+	// 			if ( restore ) {
+
+	// 				_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
+
+	// 			}
+
+	// 		}
+
+	// 	}
+
+	var data = new Uint8Array(cubeCamera.renderTarget.width * cubeCamera.renderTarget.height * 4 * 6);
+	cubeCamera.updateCubeMap(renderer, maskScene);
+	renderer.readRenderTargetPixels ( cubeCamera.renderTarget, 0, 0, cubeCamera.renderTarget.width, cubeCamera.renderTarget.height, data );
+
+	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.001, vertexColors: THREE.VertexColors}) ));
+				
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
-	//controls.enablePan = controls.enableZoom = false;
-	controls.enableKeys = false;
+	controls.enablePan = controls.enableZoom = controls.enableKeys = false;	 
 	controls.target.set(0, 0, 0);
 
 	renderer.setClearColor(new THREE.Color("white"), 1.0);
