@@ -247,6 +247,8 @@ window.onload = () => {
 	
 
 
+
+
 	var maskMaterial = new THREE.ShaderMaterial({
 
 		// fbm
@@ -281,79 +283,17 @@ window.onload = () => {
 	var cubeCamera = new THREE.CubeCamera( 0.1, 100000, 512);
 	maskScene.add( cubeCamera );
 
-
-// var gl = renderer.getContext();
-// var framebuffer = renderTarget.__webglFramebuffer;
-// gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-// var data = new Uint8Array(renderTarget.width * renderTarget.height * 4);
-// gl.readPixels(0,0,renderTarget.width,renderTarget.heigh,gl.RGBA,gl.UNSIGNED_BYTE,data);
-
-	// var framebuffer = properties.get( renderTarget ).__webglFramebuffer;
-
-	// 	if ( framebuffer ) {
-
-	// 		var restore = false;
-
-	// 		if ( framebuffer !== _currentFramebuffer ) {
-
-	// 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-
-	// 			restore = true;
-
-	// 		}
-
-	// 		try {
-
-	// 			var texture = renderTarget.texture;
-
-	// 			if ( texture.format !== THREE.RGBAFormat && paramThreeToGL( texture.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
-
-	// 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
-	// 				return;
-
-	// 			}
-
-	// 			if ( texture.type !== THREE.UnsignedByteType &&
-	// 			     paramThreeToGL( texture.type ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) &&
-	// 			     ! ( texture.type === THREE.FloatType && extensions.get( 'WEBGL_color_buffer_float' ) ) &&
-	// 			     ! ( texture.type === THREE.HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
-
-	// 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
-	// 				return;
-
-	// 			}
-
-	// 			if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
-
-	// 				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
-
-	// 				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
-
-	// 					_gl.readPixels( x, y, width, height, paramThreeToGL( texture.format ), paramThreeToGL( texture.type ), buffer );
-
-	// 				}
-
-	// 			} else {
-
-	// 				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
-
-	// 			}
-
-	// 		} finally {
-
-	// 			if ( restore ) {
-
-	// 				_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
-
-	// 			}
-
-	// 		}
-
-	// 	}
-
-	var data = new Uint8Array(cubeCamera.renderTarget.width * cubeCamera.renderTarget.height * 4 * 6);
 	cubeCamera.updateCubeMap(renderer, maskScene);
-	renderer.readRenderTargetPixels ( cubeCamera.renderTarget, 0, 0, cubeCamera.renderTarget.width, cubeCamera.renderTarget.height, data );
+	var framebuffer = (<any>renderer).properties.get( cubeCamera.renderTarget ).__webglFramebuffer;
+
+	var gl = renderer.getContext();
+	var prevFrameBuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer[0]);
+	var data = new Uint8Array(cubeCamera.renderTarget.width * cubeCamera.renderTarget.height * 4);
+	gl.readPixels(0, 0, cubeCamera.renderTarget.width, cubeCamera.renderTarget.height, gl.RGBA,gl.UNSIGNED_BYTE, data);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, prevFrameBuffer);
+
+
 
 	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.001, vertexColors: THREE.VertexColors}) ));
 				
