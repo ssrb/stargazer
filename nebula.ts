@@ -184,11 +184,11 @@ window.onload = () => {
 			gradTexture: { value: gradTexture2 },
 			ditherAmt: { value: 0.03 },
 			gain: { value: 0.5 },
-			innerColor: { value: new THREE.Vector3(0.0, 0.0, 0.0) },
+			innerColor: { value: new THREE.Color("black") },
 			lacunarity: { value: 2.0 },
 			offset: {value: 1.0},
 			octaves: { value: 7 },
-			outerColor: { value: new THREE.Vector3(0.0, 0.0, 0.0) },
+			outerColor: { value: new THREE.Color("black") },
 			powerAmt: { value: 1.0 },
 			shelfAmt: { value: 0.0 },
 			noiseScale: { value: 1.0 }
@@ -221,34 +221,7 @@ window.onload = () => {
 	scene.add(mesh2);
 
 
-	var geometry = new THREE.Geometry();
-
-
-	var mNumPoints = 1000;
-	var rand = seedrandom(132);
-	var radius = 0.999;
-
-	var far = new THREE.Color("white"), near = new THREE.Color("blue");
-
-	for(var i = 0; i < mNumPoints; ++i) {
-        // nicer distribution
-        var u = -1.0 + 2.0 * rand();
-        var a = 2 * Math.PI * rand();
-        var s = Math.sqrt(1 - u*u);
-        
-        geometry.vertices.push(
-			new THREE.Vector3( radius * s * Math.cos(a),  radius * s * Math.sin(a), radius * u )
-		);
-
-		geometry.colors.push(
-			far.clone().lerp(near, rand())
-		);
-    }
 	
-
-
-
-
 	var maskMaterial = new THREE.ShaderMaterial({
 
 		// fbm
@@ -257,10 +230,10 @@ window.onload = () => {
 			gradTexture: { value: gradTexture1},
 			ditherAmt: { value: 0.03},
 			gain: { value: 0.5},
-			innerColor: { value: new THREE.Vector3(255/255, 0/255, 153/255)},
+			innerColor: { value: new THREE.Color("black")},
 			lacunarity: { value: 2.0},
 			octaves: { value: 8},
-			outerColor: { value: new THREE.Vector3(1 / 255, 79 / 255, 91 / 255) },
+			outerColor: { value: new THREE.Color("white")},
 			powerAmt: { value: 1.0},
 			shelfAmt: { value: 0.0},
 			noiseScale: { value: 1.0}			
@@ -280,7 +253,9 @@ window.onload = () => {
 		maskMaterial
 	));
 
-	var cubeCamera = new THREE.CubeCamera( 0.1, 100000, 512);
+	var maskSize = 512;
+
+	var cubeCamera = new THREE.CubeCamera( 0.1, 100000, maskSize);
 	maskScene.add( cubeCamera );
 
 	cubeCamera.updateCubeMap(renderer, maskScene);
@@ -288,12 +263,103 @@ window.onload = () => {
 
 	var gl = renderer.getContext();
 	var prevFrameBuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
-	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer[0]);
-	var data = new Uint8Array(cubeCamera.renderTarget.width * cubeCamera.renderTarget.height * 4);
-	gl.readPixels(0, 0, cubeCamera.renderTarget.width, cubeCamera.renderTarget.height, gl.RGBA,gl.UNSIGNED_BYTE, data);
+	
+	var faces : Uint8Array[] = [];
+	for (var facei = 0; facei < 6; ++facei) {
+		gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer[facei]);
+		faces[facei] = new Uint8Array(cubeCamera.renderTarget.width * cubeCamera.renderTarget.height * 4);
+		gl.readPixels(0, 0, cubeCamera.renderTarget.width, cubeCamera.renderTarget.height, gl.RGBA,gl.UNSIGNED_BYTE, faces[facei]);
+	}
 	gl.bindFramebuffer(gl.FRAMEBUFFER, prevFrameBuffer);
 
 
+	var geometry = new THREE.Geometry();
+
+
+	var mNumPoints = 1000;
+	var rand = seedrandom(132);
+	var radius = 0.999;
+
+	var far = new THREE.Color("white"), near = new THREE.Color("blue");
+
+	// for(var i = 0; i < mNumPoints; ++i) {
+ //        // nicer distribution
+ //        var u = -1.0 + 2.0 * rand();
+ //        var a = 2 * Math.PI * rand();
+ //        var s = Math.sqrt(1 - u*u);
+        
+ //        geometry.vertices.push(
+	// 		new THREE.Vector3( radius * s * Math.cos(a),  radius * s * Math.sin(a), radius * u )
+	// 	);
+
+	// 	geometry.colors.push(
+	// 		far.clone().lerp(near, rand())
+	// 	);
+ //    }
+
+    
+    var numPointsTested = 0;
+    var maxNumTestPoints = 10;
+	while(mNumPoints) {
+
+        // pick random co-ords on the top face
+        var rU = rand();
+        var rV = rand();
+
+		var u = Math.floor(rU * maskSize);
+        var v = Math.floor(rV * maskSize);
+
+        // pick a random face
+        var facei = Math.floor(rand() * 6);
+
+        // use noise mask to discard positions
+        ++numPointsTested;
+
+        // get the noise value at this position 0..255
+        var n = faces[facei][((v * maskSize) + u) * 4];
+
+        // scale n to between 0..1
+        // n *= noiseScale;
+
+        // get a random value between 0..1 to use for density test
+        var r = rand();
+
+        // now see if the random value is less than the noise value
+        // should give us a greater density of points for higher noise values
+        if (r > (n * n)) {
+            // only test a certain number of points so we don't infinite loop
+            if(numPointsTested == maxNumTestPoints) {
+                mNumPoints--;
+            }
+            continue;
+        }
+        
+        // scale u and v to range -1 .. 1
+
+        var u = -1.0 + 2.0 * rU;
+        var a = 1.0;
+        var s = Math.sqrt(1 - u*u);
+        
+        geometry.vertices.push(
+			new THREE.Vector3( radius * s * Math.cos(a),  radius * s * Math.sin(a), radius * u )
+		);
+	
+        var p = new THREE.Vector3( (rU * 2.0) - 1.0 , 1.0, (rV * 2.0) - 1.0);
+
+        // rotate v to this face on the unit cube centered at 0,0,0
+        rotatePoint(p, facei);
+       
+        // use this position
+        geometry.vertices.push(p);
+
+        mNumPoints--;
+        numPointsTested = 0;
+
+    	geometry.colors.push(
+			far.clone().lerp(near, rand())
+		);
+    }
+    
 
 	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.001, vertexColors: THREE.VertexColors}) ));
 				
@@ -321,4 +387,43 @@ window.onload = () => {
 	}
 
 	animate();
+}
+
+
+function rotatePoint(p: THREE.Vector3, facei: number) : void
+{
+	var vTmp = p.clone();
+
+	if(facei == 0) {
+		// right
+		p.x = vTmp.y;
+		p.y = -vTmp.z;
+		p.z = -vTmp.x;
+	}
+	else if(facei == 1) {
+		// left
+		p.x = -vTmp.y;
+		p.y = -vTmp.z;
+		p.z = vTmp.x;
+	}
+	else if(facei == 2) {
+	// top - do nothing
+	}
+	else if(facei == 3) {
+		// bottom
+		p.y = -vTmp.y;
+		p.z = -vTmp.z;
+	}
+	else if(facei == 4) {
+		// front
+		p.y = -vTmp.z;
+		p.z = vTmp.y;
+	}
+	else if(facei ==  5) {
+		// back
+		p.x = -vTmp.x;
+		p.y = -vTmp.z;
+		p.z = -vTmp.y;
+	}
+	p.z = -p.z;
 }
