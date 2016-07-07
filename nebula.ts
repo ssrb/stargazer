@@ -210,7 +210,7 @@ window.onload = () => {
 	
 
 	var backgorund = new THREE.Mesh(
-		new THREE.SphereGeometry(1.5, 64, 64),
+		new THREE.SphereGeometry(2, 64, 64),
 		new THREE.MeshPhongMaterial({
 			color: "white",
 			side: THREE.BackSide, transparent : false})
@@ -275,32 +275,17 @@ window.onload = () => {
 
 	var geometry = new THREE.Geometry();
 
-
-	var mNumPoints = 1000;
+	var far = new THREE.Color("white"), near = new THREE.Color("blue");
+    
+	var mNumPoints = 0;
 	var rand = seedrandom(132);
 	var radius = 0.999;
 
-	var far = new THREE.Color("white"), near = new THREE.Color("blue");
-
-	// for(var i = 0; i < mNumPoints; ++i) {
- //        // nicer distribution
- //        var u = -1.0 + 2.0 * rand();
- //        var a = 2 * Math.PI * rand();
- //        var s = Math.sqrt(1 - u*u);
-        
- //        geometry.vertices.push(
-	// 		new THREE.Vector3( radius * s * Math.cos(a),  radius * s * Math.sin(a), radius * u )
-	// 	);
-
-	// 	geometry.colors.push(
-	// 		far.clone().lerp(near, rand())
-	// 	);
- //    }
-
-    
     var numPointsTested = 0;
-    var maxNumTestPoints = 10;
-	while(mNumPoints) {
+   
+    var maxNumPoints = 5000;
+
+	while(mNumPoints < maxNumPoints && numPointsTested < 10 * maxNumPoints) {
 
         // pick random co-ords on the top face
         var rU = rand();
@@ -319,49 +304,31 @@ window.onload = () => {
         var n = faces[facei][((v * maskSize) + u) * 4];
 
         // scale n to between 0..1
-        // n *= noiseScale;
-
-        // get a random value between 0..1 to use for density test
-        var r = rand();
+        n /= 255;
 
         // now see if the random value is less than the noise value
         // should give us a greater density of points for higher noise values
-        if (r > (n * n)) {
-            // only test a certain number of points so we don't infinite loop
-            if(numPointsTested == maxNumTestPoints) {
-                mNumPoints--;
-            }
-            continue;
-        }
-        
-        // scale u and v to range -1 .. 1
+        if (rand() <= (n * n)) {           
+  			++mNumPoints;
+	  
+	        var p = new THREE.Vector3( (rU * 2.0) - 1.0 , 1.0, (rV * 2.0) - 1.0);
 
-        var u = -1.0 + 2.0 * rU;
-        var a = 1.0;
-        var s = Math.sqrt(1 - u*u);
-        
-        geometry.vertices.push(
-			new THREE.Vector3( radius * s * Math.cos(a),  radius * s * Math.sin(a), radius * u )
-		);
-	
-        var p = new THREE.Vector3( (rU * 2.0) - 1.0 , 1.0, (rV * 2.0) - 1.0);
+			// rotate v to this face on the unit cube centered at 0,0,0
+	        rotatePoint(p, facei);
 
-        // rotate v to this face on the unit cube centered at 0,0,0
-        rotatePoint(p, facei);
-       
-        // use this position
-        geometry.vertices.push(p);
+	        p.normalize();
+	        p.multiplyScalar(radius);
 
-        mNumPoints--;
-        numPointsTested = 0;
-
-    	geometry.colors.push(
-			far.clone().lerp(near, rand())
-		);
+			geometry.vertices.push(p);
+	        	      
+	    	geometry.colors.push(
+				far.clone().lerp(near, rand())
+			);
+        }               
     }
     
 
-	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.001, vertexColors: THREE.VertexColors}) ));
+	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.001, vertexColors: THREE.VertexColors, transparent: true}) ));
 				
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
 	controls.enablePan = controls.enableZoom = controls.enableKeys = false;	 
