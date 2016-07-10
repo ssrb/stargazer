@@ -283,7 +283,7 @@ window.onload = () => {
 
     var numPointsTested = 0;
    
-    var maxNumPoints = 5000;
+    var maxNumPoints = 1000;
 
 	while(mNumPoints < maxNumPoints && numPointsTested < 10 * maxNumPoints) {
 
@@ -329,7 +329,11 @@ window.onload = () => {
     
 
 	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.001, vertexColors: THREE.VertexColors, transparent: true}) ));
-				
+	
+	var textureLoader = new THREE.TextureLoader();
+	var texture1 = textureLoader.load( "images/flare-blue-purple2.png" );
+	scene.add(new THREE.Mesh( new THREE.PlaneGeometry(0.1, 0.1), new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture1, transparent: true} )));
+
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
 	controls.enablePan = controls.enableZoom = controls.enableKeys = false;	 
 	controls.target.set(0, 0, 0);
