@@ -55,7 +55,7 @@ window.onload = () => {
 	renderer.setPixelRatio(window.devicePixelRatio);
 
 	camera = new THREE.PerspectiveCamera(30, 1, 0.1, 10000);
-	camera.position.z = 1.5;
+	camera.position.z = 0.01;
 
 	function doResize(): void {
 		var w = view.offsetWidth, h = window.innerHeight - document.getElementById("header").offsetHeight;
@@ -207,21 +207,18 @@ window.onload = () => {
 		new THREE.SphereGeometry(1, 64, 64),
 		material2
 	);
-	
 
-	var backgorund = new THREE.Mesh(
+	var background = new THREE.Mesh(
 		new THREE.SphereGeometry(2, 64, 64),
 		new THREE.MeshPhongMaterial({
 			color: "white",
 			side: THREE.BackSide, transparent : false})
 	);
 
-	scene.add(backgorund);
+	scene.add(background);
 	scene.add(mesh1);
-	scene.add(mesh2);
+	//scene.add(mesh2);
 
-
-	
 	var maskMaterial = new THREE.ShaderMaterial({
 
 		// fbm
@@ -283,7 +280,7 @@ window.onload = () => {
 
     var numPointsTested = 0;
    
-    var maxNumPoints = 1000;
+    var maxNumPoints = 5000;
 
 	while(mNumPoints < maxNumPoints && numPointsTested < 10 * maxNumPoints) {
 
@@ -327,15 +324,66 @@ window.onload = () => {
         }               
     }
     
-
-	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.001, vertexColors: THREE.VertexColors, transparent: true}) ));
+	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.004, vertexColors: THREE.VertexColors, depthTest: false, transparent: true}) ));
 	
 	var textureLoader = new THREE.TextureLoader();
 	var texture1 = textureLoader.load( "images/flare-blue-purple2.png" );
-	scene.add(new THREE.Mesh( new THREE.PlaneGeometry(0.1, 0.1), new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture1, transparent: true} )));
 
+	var billboard = new THREE.Mesh( new THREE.PlaneGeometry(0.1, 0.1), new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture1, depthTest: false, transparent: true }));	
+	//billboard.position.z = -radius;
+	//scene.add(billboard);
+
+	mNumPoints = 0;
+	rand = seedrandom(22);
+	radius = 0.8;
+    numPointsTested = 0;
+	maxNumPoints = 20;
+
+	while(mNumPoints < maxNumPoints && numPointsTested < 10 * maxNumPoints) {
+
+        // pick random co-ords on the top face
+        var rU = rand();
+        var rV = rand();
+
+		var u = Math.floor(rU * maskSize);
+        var v = Math.floor(rV * maskSize);
+
+        // pick a random face
+        var facei = Math.floor(rand() * 6);
+
+        // use noise mask to discard positions
+        ++numPointsTested;
+
+        // get the noise value at this position 0..255
+        var n = faces[facei][((v * maskSize) + u) * 4];
+
+        // scale n to between 0..1
+        n /= 255;
+
+        // now see if the random value is less than the noise value
+        // should give us a greater density of points for higher noise values
+        if (rand() <= (n * n)) {           
+  			++mNumPoints;
+	  		var b = billboard.clone();
+	        var p = new THREE.Vector3( (rU * 2.0) - 1.0 , 1.0, (rV * 2.0) - 1.0);
+
+			// rotate v to this face on the unit cube centered at 0,0,0
+	        rotatePoint(p, facei);
+
+	        p.normalize();
+	        p.multiplyScalar(radius);
+
+			b.position.x = p.x;
+			b.position.y = p.y;
+			b.position.z = p.z;
+
+			b.lookAt(new THREE.Vector3(0, 0, 0));
+			scene.add(b);
+        }               
+    }
+	
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
-	controls.enablePan = controls.enableZoom = controls.enableKeys = false;	 
+	controls.enablePan = controls.enableZoom = controls.enableKeys = true;
 	controls.target.set(0, 0, 0);
 
 	renderer.setClearColor(new THREE.Color("white"), 1.0);
@@ -347,9 +395,7 @@ window.onload = () => {
 
 		var dt = (timeNow - lastTime) / (60 * 1000);
 		var dtheta = 2 * Math.PI * 0.5 * dt				
-		//mesh.rotation.x += dtheta;
-		//mesh.rotation.y += dtheta;
-		
+						
 		renderer.render(scene, camera);
 
 		requestAnimationFrame(animate);
