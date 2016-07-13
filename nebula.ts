@@ -339,6 +339,7 @@ window.onload = () => {
     numPointsTested = 0;
 	maxNumPoints = 20;
 
+	var bbs : THREE.Mesh[] = [];
 	while(mNumPoints < maxNumPoints && numPointsTested < 10 * maxNumPoints) {
 
         // pick random co-ords on the top face
@@ -360,6 +361,7 @@ window.onload = () => {
         // scale n to between 0..1
         n /= 255;
 
+        
         // now see if the random value is less than the noise value
         // should give us a greater density of points for higher noise values
         if (rand() <= (n * n)) {           
@@ -379,11 +381,12 @@ window.onload = () => {
 
 			b.lookAt(new THREE.Vector3(0, 0, 0));
 			scene.add(b);
+			bbs.push(b);
         }               
     }
 	
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
-	controls.enablePan = controls.enableZoom = controls.enableKeys = true;
+	controls.enablePan = controls.enableZoom = controls.enableKeys = false;
 	controls.target.set(0, 0, 0);
 
 	renderer.setClearColor(new THREE.Color("white"), 1.0);
@@ -393,9 +396,28 @@ window.onload = () => {
 
 		var timeNow = new Date().getTime();
 
-		var dt = (timeNow - lastTime) / (60 * 1000);
+		var dt = (timeNow - lastTime) / 1000;
 		var dtheta = 2 * Math.PI * 0.5 * dt				
-						
+	
+		var xCam = new THREE.Vector3();
+		var yCam = new THREE.Vector3();
+		var zCam = new THREE.Vector3();
+		var xBill = new THREE.Vector3();
+		var yBill = new THREE.Vector3();
+		var zBill = new THREE.Vector3();
+
+		for (var i = 0; i < bbs.length; ++i) {
+			camera.matrixWorld.extractBasis( xCam, yCam, zCam );
+			bbs[i].matrix.extractBasis( xBill, yBill, zBill );
+
+			yCam.negate();
+			xBill.crossVectors(yCam, zBill);
+			yBill.crossVectors(zBill, xBill);
+
+			bbs[i].matrix.makeBasis(xBill, yBill, zBill);
+			bbs[i].updateMatrixWorld(true);
+		}
+
 		renderer.render(scene, camera);
 
 		requestAnimationFrame(animate);
