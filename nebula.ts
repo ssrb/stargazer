@@ -54,7 +54,7 @@ window.onload = () => {
 	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false});
 	renderer.setPixelRatio(window.devicePixelRatio);
 
-	camera = new THREE.PerspectiveCamera(30, 1, 0.1, 10000);
+	camera = new THREE.PerspectiveCamera(30, 1, 0.1, 10000);	
 	camera.position.z = 0.01;
 
 	function doResize(): void {
@@ -131,11 +131,13 @@ window.onload = () => {
 		fragmentShader: require('./shaders/noise_fbm.fs')(),		
 
 	});
-	material1.transparent = true;
+	//material1.transparent = true;
 	material1.side = THREE.BackSide;	
-	material1.blendSrc = THREE.OneFactor;
-	material1.blendDst = <any>THREE.ZeroFactor;
-	material1.blending = THREE.NormalBlending;
+	//material1.blendSrc = THREE.OneFactor;
+	//material1.blendDst = <any>THREE.ZeroFactor;
+	//material1.blending = THREE.NormalBlending;
+	material1.depthTest =  false;
+	material1.depthWrite = false;
 
 	mesh1 = new THREE.Mesh(
 		new THREE.SphereGeometry(1, 64, 64),
@@ -199,9 +201,11 @@ window.onload = () => {
 	});
 	material2.transparent = true;
 	material2.side = THREE.BackSide;		
-	material2.blendSrc = <any>THREE.SrcAlphaFactor;
-	material2.blendDst = <any>THREE.OneMinusSrcAlphaFactor;
-	material2.blending = THREE.NormalBlending;
+	//material2.blendSrc = <any>THREE.SrcAlphaFactor;
+	//material2.blendDst = <any>THREE.OneMinusSrcAlphaFactor;
+	//material2.blending = THREE.NormalBlending;
+	material2.depthTest =  false;
+	material2.depthWrite = false;
 
 	mesh2 = new THREE.Mesh(
 		new THREE.SphereGeometry(1, 64, 64),
@@ -215,9 +219,9 @@ window.onload = () => {
 			side: THREE.BackSide, transparent : false})
 	);
 
-	scene.add(background);
+	//scene.add(background);
 	scene.add(mesh1);
-	//scene.add(mesh2);
+	scene.add(mesh2);
 
 	var maskMaterial = new THREE.ShaderMaterial({
 
@@ -314,7 +318,7 @@ window.onload = () => {
 	        rotatePoint(p, facei);
 
 	        p.normalize();
-	        p.multiplyScalar(radius);
+	        //p.multiplyScalar(radius);
 
 			geometry.vertices.push(p);
 	        	      
@@ -324,14 +328,12 @@ window.onload = () => {
         }               
     }
     
-	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.004, vertexColors: THREE.VertexColors, depthTest: false, transparent: true}) ));
+	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.0001, vertexColors: THREE.VertexColors, depthTest: false, depthWrite: false, transparent: true}) ));
 	
 	var textureLoader = new THREE.TextureLoader();
 	var texture1 = textureLoader.load( "images/flare-blue-purple2.png" );
 
-	var billboard = new THREE.Mesh( new THREE.PlaneGeometry(0.1, 0.1), new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture1, depthTest: false, transparent: true }));	
-	//billboard.position.z = -radius;
-	//scene.add(billboard);
+	var billboard = new THREE.Mesh( new THREE.PlaneGeometry(0.1, 0.1), new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture1, depthTest: false, depthWrite: false, transparent: true }));	
 
 	mNumPoints = 0;
 	rand = seedrandom(22);
@@ -373,13 +375,16 @@ window.onload = () => {
 	        rotatePoint(p, facei);
 
 	        p.normalize();
-	        p.multiplyScalar(radius);
+	        //p.multiplyScalar(radius);
 
 			b.position.x = p.x;
 			b.position.y = p.y;
 			b.position.z = p.z;
 
 			b.lookAt(new THREE.Vector3(0, 0, 0));
+
+			b.updateMatrix();
+			b.matrixAutoUpdate = false;
 			scene.add(b);
 			bbs.push(b);
         }               
@@ -402,20 +407,24 @@ window.onload = () => {
 		var xCam = new THREE.Vector3();
 		var yCam = new THREE.Vector3();
 		var zCam = new THREE.Vector3();
+
+		camera.matrixWorld.extractBasis( xCam, yCam, zCam );		
+
 		var xBill = new THREE.Vector3();
 		var yBill = new THREE.Vector3();
 		var zBill = new THREE.Vector3();
 
 		for (var i = 0; i < bbs.length; ++i) {
-			camera.matrixWorld.extractBasis( xCam, yCam, zCam );
-			bbs[i].matrix.extractBasis( xBill, yBill, zBill );
+			
+			bbs[i].matrix.extractBasis( xBill, yBill, zBill);			
+			var pos = bbs[i].getWorldPosition();
 
-			yCam.negate();
 			xBill.crossVectors(yCam, zBill);
+			xBill.normalize();
 			yBill.crossVectors(zBill, xBill);
 
 			bbs[i].matrix.makeBasis(xBill, yBill, zBill);
-			bbs[i].updateMatrixWorld(true);
+			bbs[i].matrix.setPosition(pos);
 		}
 
 		renderer.render(scene, camera);
