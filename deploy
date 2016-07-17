@@ -3,9 +3,11 @@ set -e # exit with nonzero exit code if anything fails
 	if [[ $TRAVIS ]]; then
 	mkdir _site
 	cd _site
-	cp ../mega-structure.html .
+	cp ../nebula.html .
 	cp ../bundle.js ../OrbitControls.js .
 	cp -r ../bower_components .
+	#cp -r ../examples .
+	cp -r ../images .
 	git init
 	git config --global user.email "sb@unhexhexium.net"
 	git config --global user.name "ssrb (via Travis CI)"
