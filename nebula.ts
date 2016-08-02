@@ -42,6 +42,7 @@ var app: ng.IModule = angular.module('Nebula.App', []);
 window.onload = () => {
 
 	var view = document.getElementById("nebula-view");
+	var blockly = document.getElementById("blockly-div");
 
 	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false});
 	renderer.setPixelRatio(window.devicePixelRatio);
@@ -54,11 +55,11 @@ window.onload = () => {
 		w *= 0.95;
 		h *= 0.95;
 		renderer.setSize(w, h);
-		camera.aspect = w / h;
+		blockly.style.height = h + "px";
 		camera.updateProjectionMatrix();
-	}
+	}	
+	window.addEventListener('resize', doResize, false);
 	doResize();
-	window.addEventListener('resize', doResize);
 
 	view.appendChild(renderer.domElement);
 
@@ -110,7 +111,7 @@ window.onload = () => {
 		// var dtheta = 2 * Math.PI * 0.5 * dt				
 			
 		bboards.animate(camera);
-		
+
 		renderer.render(scene, camera);
 
 		requestAnimationFrame(animate);

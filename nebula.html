@@ -17,8 +17,12 @@
 	<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 
 	<!-- Three -->
-	<script type="text/javascript" src="bower_components/three.js/three.min.js"></script>
+	<script type="text/javascript" src="bower_components/three.js/three.js"></script>
 	<script type="text/javascript" src="OrbitControls.js"></script>
+
+  	<script type="text/javascript" src="bower_components/google-blockly/blockly_compressed.js"></script>
+  	<script type="text/javascript" src="bower_components/google-blockly/blocks_compressed.js"></script>
+  	<script type="text/javascript" src="bower_components/google-blockly/msg/js/en.js"></script>
 
 	<style>
 		.title {
@@ -43,7 +47,7 @@
 
 <body>
 
-<pre class="title col-lg-8" id="header">         _             _            _         _                  _             _          
+<pre class="title col-lg-12" id="header">         _             _            _         _                  _             _          
         /\ \     _    /\ \         / /\      /\_\               _\ \          / /\        
        /  \ \   /\_\ /  \ \       / /  \    / / /         _    /\__ \        / /  \       
       / /\ \ \_/ / // /\ \ \     / / /\ \   \ \ \__      /\_\ / /_ \_\      / / /\ \      
@@ -59,9 +63,26 @@
 
 <!--a href="https://github.com/ssrb/nebula"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a-->
 
-<div class="row">		
-    	<div class="col-lg-12" id="nebula-view"></div>
+<div class="row">	
+		<div class="col-lg-4" id="blockly-div"></div>	
+    	<div class="col-lg-8" id="nebula-view" style="background: white;"></div>
 </div>
+
+<xml id="blockly-toolbox" style="display: none">
+	<block type="controls_if"></block>
+	<block type="logic_compare"></block>
+	<block type="controls_repeat_ext"></block>
+	<block type="math_number"></block>
+	<block type="math_arithmetic"></block>
+	<block type="text"></block>
+	<block type="text_print"></block>
+</xml>
+
+<script>
+var workspace = Blockly.inject('blockly-div',
+    {media: 'bower_components/google-blockly/media/',
+     toolbox: document.getElementById('blockly-toolbox')});
+</script>
 
 <script src="bundle.js"></script>
 
