@@ -29,19 +29,11 @@
 
 var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
-import Noise = require('./noise');
-import Points = require('./points');
-
-// Browserify will bundle shaders and js all together for us.
-// In order to do so, the tool must find a 'require' with a string literal argument
-// to figure out what must be bundled together
-require('./shaders/noise.vs');
-require('./shaders/noise_fbm.fs');
-require('./shaders/noise_ridged.fs');
+import { Points } from './points';
+import { FBMNoiseMaterial, RidgedFBMNoiseMaterial } from './noise';
+import { Billboards } from './billboard';
 
 var renderer: THREE.WebGLRenderer;
-var mesh1: THREE.Mesh;
-var mesh2: THREE.Mesh;
 var camera: THREE.PerspectiveCamera;
 var controls: THREE.OrbitControls;	
 
@@ -74,324 +66,37 @@ window.onload = () => {
 
 	scene.add(camera);
 
-	var noise1 = new Noise(0);
-
-	var permTexture1 = new THREE.DataTexture(
-		<any>noise1.permutations,
-		256,
-		256,
-		THREE.RGBAFormat,
-		THREE.UnsignedByteType, 
-		THREE.UVMapping, 
-		THREE.RepeatWrapping,
-		THREE.RepeatWrapping,
-		THREE.LinearFilter,
-		THREE.LinearFilter
-	);
-	permTexture1.anisotropy = 1.0;
-	permTexture1.needsUpdate = true;
-	permTexture1.generateMipmaps = false;
-	permTexture1.premultiplyAlpha = false;
-
-	var gradTexture1 = new THREE.DataTexture(
-		<any>noise1.gradients,
-		256,
-		1,
-		THREE.RGBFormat,
-		THREE.UnsignedByteType, 
-		THREE.UVMapping, 
-		THREE.RepeatWrapping, 
-		THREE.RepeatWrapping,
-		THREE.LinearFilter,
-		THREE.LinearFilter
-	);
-	gradTexture1.anisotropy = 1.0;
-	gradTexture1.needsUpdate = true;
-	gradTexture1.generateMipmaps = false;
-
-	var material1 = new THREE.ShaderMaterial({
-
-		// fbm
-		uniforms: {
-			permTexture: { value: permTexture1},
-			gradTexture: { value: gradTexture1},
-			ditherAmt: { value: 0.03},
-			gain: { value: 0.5},
-			innerColor: { value: new THREE.Vector3(255/255, 0/255, 153/255)},
-			lacunarity: { value: 2.0},
-			octaves: { value: 8},
-			outerColor: { value: new THREE.Vector3(1 / 255, 79 / 255, 91 / 255) },
-			powerAmt: { value: 1.0},
-			shelfAmt: { value: 0.0},
-			noiseScale: { value: 1.0}			
-		},
-		
-		vertexShader: require('./shaders/noise.vs')(),
-		// fbm
-		fragmentShader: require('./shaders/noise_fbm.fs')(),		
-
-	});
-	//material1.transparent = true;
-	material1.side = THREE.BackSide;	
-	//material1.blendSrc = THREE.OneFactor;
-	//material1.blendDst = <any>THREE.ZeroFactor;
-	//material1.blending = THREE.NormalBlending;
-	material1.depthTest =  false;
-	material1.depthWrite = false;
-
-	mesh1 = new THREE.Mesh(
-		new THREE.SphereGeometry(1, 64, 64),
-		material1
-	);
-	
-	var noise2 = new Noise(1);
-
-	var permTexture2 = new THREE.DataTexture(
-		<any>noise2.permutations,
-		256,
-		256,
-		THREE.RGBAFormat,
-		THREE.UnsignedByteType, 
-		THREE.UVMapping, 
-		THREE.RepeatWrapping,
-		THREE.RepeatWrapping,
-		THREE.LinearFilter,
-		THREE.LinearFilter
-	);
-	permTexture2.anisotropy = 1.0;
-	permTexture2.needsUpdate = true;
-	permTexture2.generateMipmaps = false;
-
-	var gradTexture2 = new THREE.DataTexture(
-		<any>noise2.gradients,
-		256,
-		1,
-		THREE.RGBFormat,
-		THREE.UnsignedByteType, 
-		THREE.UVMapping, 
-		THREE.RepeatWrapping, 
-		THREE.RepeatWrapping,
-		THREE.LinearFilter,
-		THREE.LinearFilter
-	);
-	gradTexture2.anisotropy = 1.0;
-	gradTexture2.needsUpdate = true;
-	gradTexture2.generateMipmaps = false;
-
-	var material2 = new THREE.ShaderMaterial({
-
-		// ridged
-		uniforms: {
-			permTexture: { value: permTexture2 },
-			gradTexture: { value: gradTexture2 },
-			ditherAmt: { value: 0.03 },
-			gain: { value: 0.5 },
-			innerColor: { value: new THREE.Color("black") },
-			lacunarity: { value: 2.0 },
-			offset: {value: 1.0},
-			octaves: { value: 7 },
-			outerColor: { value: new THREE.Color("black") },
-			powerAmt: { value: 1.0 },
-			shelfAmt: { value: 0.0 },
-			noiseScale: { value: 1.0 }
-		},
-
-		vertexShader: require('./shaders/noise.vs')(),
-		fragmentShader: require('./shaders/noise_ridged.fs')()
-	});
-	material2.transparent = true;
-	material2.side = THREE.BackSide;		
-	//material2.blendSrc = <any>THREE.SrcAlphaFactor;
-	//material2.blendDst = <any>THREE.OneMinusSrcAlphaFactor;
-	//material2.blending = THREE.NormalBlending;
-	material2.depthTest =  false;
-	material2.depthWrite = false;
-
-	mesh2 = new THREE.Mesh(
-		new THREE.SphereGeometry(1, 64, 64),
-		material2
-	);
-
 	var background = new THREE.Mesh(
 		new THREE.SphereGeometry(2, 64, 64),
 		new THREE.MeshPhongMaterial({
 			color: "white",
-			side: THREE.BackSide, transparent : false})
+			side: THREE.BackSide,
+			depthTest: false, 
+			depthWrite: false })
 	);
 
-	//scene.add(background);
-	scene.add(mesh1);
-	scene.add(mesh2);
-
-	var maskMaterial = new THREE.ShaderMaterial({
-
-		// fbm
-		uniforms: {
-			permTexture: { value: permTexture1},
-			gradTexture: { value: gradTexture1},
-			ditherAmt: { value: 0.03},
-			gain: { value: 0.5},
-			innerColor: { value: new THREE.Color("black")},
-			lacunarity: { value: 2.0},
-			octaves: { value: 8},
-			outerColor: { value: new THREE.Color("white")},
-			powerAmt: { value: 1.0},
-			shelfAmt: { value: 0.0},
-			noiseScale: { value: 1.0}			
-		},
-		
-		vertexShader: require('./shaders/noise.vs')(),
-		// fbm
-		fragmentShader: require('./shaders/noise_fbm.fs')(),		
-
-	});
-	maskMaterial.side = THREE.BackSide;	
-
-
-	var maskScene = new THREE.Scene();
-	maskScene.add(new THREE.Mesh(
-		new THREE.SphereGeometry(1, 64, 64),
-		maskMaterial
+	scene.add(background);		
+	scene.add(new  THREE.Mesh(
+				new THREE.SphereGeometry(1, 64, 64),
+				new FBMNoiseMaterial(
+					new THREE.Color(255/255, 0/255, 153/255),
+					new THREE.Color(1 / 255, 79 / 255, 91 / 255)
+				)
+	));
+	scene.add(new  THREE.Mesh(
+				new THREE.SphereGeometry(1, 64, 64),
+				new RidgedFBMNoiseMaterial(
+					new THREE.Color("black"),
+					new THREE.Color("black")
+				)
 	));
 
-	var maskSize = 512;
+	scene.add(new Points(renderer));
 
-	var cubeCamera = new THREE.CubeCamera( 0.1, 100000, maskSize);
-	maskScene.add( cubeCamera );
+	var bboards = new Billboards(scene, renderer);
 
-	cubeCamera.updateCubeMap(renderer, maskScene);
-	var framebuffer = (<any>renderer).properties.get( cubeCamera.renderTarget ).__webglFramebuffer;
-
-	var gl = renderer.getContext();
-	var prevFrameBuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
-	
-	var faces : Uint8Array[] = [];
-	for (var facei = 0; facei < 6; ++facei) {
-		gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer[facei]);
-		faces[facei] = new Uint8Array(cubeCamera.renderTarget.width * cubeCamera.renderTarget.height * 4);
-		gl.readPixels(0, 0, cubeCamera.renderTarget.width, cubeCamera.renderTarget.height, gl.RGBA,gl.UNSIGNED_BYTE, faces[facei]);
-	}
-	gl.bindFramebuffer(gl.FRAMEBUFFER, prevFrameBuffer);
-
-
-	var geometry = new THREE.Geometry();
-
-	var far = new THREE.Color("white"), near = new THREE.Color("blue");
-    
-	var mNumPoints = 0;
-	var rand = seedrandom(132);
-	var radius = 0.999;
-
-    var numPointsTested = 0;
-   
-    var maxNumPoints = 5000;
-
-	while(mNumPoints < maxNumPoints && numPointsTested < 10 * maxNumPoints) {
-
-        // pick random co-ords on the top face
-        var rU = rand();
-        var rV = rand();
-
-		var u = Math.floor(rU * maskSize);
-        var v = Math.floor(rV * maskSize);
-
-        // pick a random face
-        var facei = Math.floor(rand() * 6);
-
-        // use noise mask to discard positions
-        ++numPointsTested;
-
-        // get the noise value at this position 0..255
-        var n = faces[facei][((v * maskSize) + u) * 4];
-
-        // scale n to between 0..1
-        n /= 255;
-
-        // now see if the random value is less than the noise value
-        // should give us a greater density of points for higher noise values
-        if (rand() <= (n * n)) {           
-  			++mNumPoints;
-	  
-	        var p = new THREE.Vector3( (rU * 2.0) - 1.0 , 1.0, (rV * 2.0) - 1.0);
-
-			// rotate v to this face on the unit cube centered at 0,0,0
-	        rotatePoint(p, facei);
-
-	        p.normalize();
-	        //p.multiplyScalar(radius);
-
-			geometry.vertices.push(p);
-	        	      
-	    	geometry.colors.push(
-				far.clone().lerp(near, rand())
-			);
-        }               
-    }
-    
-	scene.add(new THREE.Points( geometry, new THREE.PointsMaterial({size: 0.0001, vertexColors: THREE.VertexColors, depthTest: false, depthWrite: false, transparent: true}) ));
-	
-	var textureLoader = new THREE.TextureLoader();
-	var texture1 = textureLoader.load( "images/flare-blue-purple2.png" );
-
-	var billboard = new THREE.Mesh( new THREE.PlaneGeometry(0.1, 0.1), new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture1, depthTest: false, depthWrite: false, transparent: true }));	
-
-	mNumPoints = 0;
-	rand = seedrandom(22);
-	radius = 0.8;
-    numPointsTested = 0;
-	maxNumPoints = 20;
-
-	var bbs : THREE.Mesh[] = [];
-	while(mNumPoints < maxNumPoints && numPointsTested < 10 * maxNumPoints) {
-
-        // pick random co-ords on the top face
-        var rU = rand();
-        var rV = rand();
-
-		var u = Math.floor(rU * maskSize);
-        var v = Math.floor(rV * maskSize);
-
-        // pick a random face
-        var facei = Math.floor(rand() * 6);
-
-        // use noise mask to discard positions
-        ++numPointsTested;
-
-        // get the noise value at this position 0..255
-        var n = faces[facei][((v * maskSize) + u) * 4];
-
-        // scale n to between 0..1
-        n /= 255;
-
-        
-        // now see if the random value is less than the noise value
-        // should give us a greater density of points for higher noise values
-        if (rand() <= (n * n)) {           
-  			++mNumPoints;
-	  		var b = billboard.clone();
-	        var p = new THREE.Vector3( (rU * 2.0) - 1.0 , 1.0, (rV * 2.0) - 1.0);
-
-			// rotate v to this face on the unit cube centered at 0,0,0
-	        rotatePoint(p, facei);
-
-	        p.normalize();
-	        //p.multiplyScalar(radius);
-
-			b.position.x = p.x;
-			b.position.y = p.y;
-			b.position.z = p.z;
-
-			b.lookAt(new THREE.Vector3(0, 0, 0));
-
-			b.updateMatrix();
-			b.matrixAutoUpdate = false;
-			scene.add(b);
-			bbs.push(b);
-        }               
-    }
-	
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
-	controls.enablePan = controls.enableZoom = controls.enableKeys = false;
+	controls.enablePan = controls.enableZoom = controls.enableKeys = true;
 	controls.target.set(0, 0, 0);
 
 	renderer.setClearColor(new THREE.Color("white"), 1.0);
@@ -401,32 +106,11 @@ window.onload = () => {
 
 		var timeNow = new Date().getTime();
 
-		var dt = (timeNow - lastTime) / 1000;
-		var dtheta = 2 * Math.PI * 0.5 * dt				
-	
-		var xCam = new THREE.Vector3();
-		var yCam = new THREE.Vector3();
-		var zCam = new THREE.Vector3();
-
-		camera.matrixWorld.extractBasis( xCam, yCam, zCam );		
-
-		var xBill = new THREE.Vector3();
-		var yBill = new THREE.Vector3();
-		var zBill = new THREE.Vector3();
-
-		for (var i = 0; i < bbs.length; ++i) {
+		// var dt = (timeNow - lastTime) / 1000;
+		// var dtheta = 2 * Math.PI * 0.5 * dt				
 			
-			bbs[i].matrix.extractBasis( xBill, yBill, zBill);			
-			var pos = bbs[i].getWorldPosition();
-
-			xBill.crossVectors(yCam, zBill);
-			xBill.normalize();
-			yBill.crossVectors(zBill, xBill);
-
-			bbs[i].matrix.makeBasis(xBill, yBill, zBill);
-			bbs[i].matrix.setPosition(pos);
-		}
-
+		bboards.animate(camera);
+		
 		renderer.render(scene, camera);
 
 		requestAnimationFrame(animate);
@@ -438,40 +122,3 @@ window.onload = () => {
 }
 
 
-function rotatePoint(p: THREE.Vector3, facei: number) : void
-{
-	var vTmp = p.clone();
-
-	if(facei == 0) {
-		// right
-		p.x = vTmp.y;
-		p.y = -vTmp.z;
-		p.z = -vTmp.x;
-	}
-	else if(facei == 1) {
-		// left
-		p.x = -vTmp.y;
-		p.y = -vTmp.z;
-		p.z = vTmp.x;
-	}
-	else if(facei == 2) {
-	// top - do nothing
-	}
-	else if(facei == 3) {
-		// bottom
-		p.y = -vTmp.y;
-		p.z = -vTmp.z;
-	}
-	else if(facei == 4) {
-		// front
-		p.y = -vTmp.z;
-		p.z = vTmp.y;
-	}
-	else if(facei ==  5) {
-		// back
-		p.x = -vTmp.x;
-		p.y = -vTmp.z;
-		p.z = -vTmp.y;
-	}
-	p.z = -p.z;
-}

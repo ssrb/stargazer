@@ -26,43 +26,76 @@
 // either expressed or implied, of the FreeBSD Project.
 
 ///<reference path="typings/tsd.d.ts"/>
-var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
 import { PointSampler, FBMNoiseMaterial } from "./noise";
 
-export class Points extends THREE.Points {
+export class Billboards {
 
-	public constructor(renderer : THREE.WebGLRenderer) {
+	public constructor(scene: THREE.Scene, renderer : THREE.WebGLRenderer) {
 
-		var geometry = new THREE.Geometry();
-		
-		var rand = seedrandom(132);
-
-		var far = new THREE.Color("white"), near = new THREE.Color("blue");
-		var numPoints = 1000;	
-		var radius = 0.999;
-
-		var sampler = new PointSampler(new FBMNoiseMaterial(new THREE.Color("black"), new THREE.Color("white")), renderer);
-
-		for (var pi = 0; pi < numPoints; ++pi) {
-			var p = sampler.sample();
-			p.multiplyScalar(radius);
-			geometry.vertices.push(p);
-			geometry.colors.push(
-	 			far.clone().lerp(near, rand())
-	 		);
-		}
-	        	      	     
-		super(
-			geometry, 
-			new THREE.PointsMaterial({
-				size: 0.0001, 
-				vertexColors: THREE.VertexColors, 
-				side: THREE.BackSide, 
+	 	var textureLoader = new THREE.TextureLoader();
+	 	var texture = textureLoader.load( "images/flare-blue-purple2.png" );
+			
+		var billboard = new THREE.Mesh( 
+			new THREE.PlaneGeometry(0.1, 0.1), 
+			new THREE.MeshBasicMaterial({
+				side: THREE.FrontSide, 
+				map: texture, 
 				transparent: true, 
 				depthTest: false, 
-				depthWrite: false 
-			})
-		);
-	}	
+				depthWrite: false
+			}));	
+
+		var numPoints = 100;	
+		var radius = 0.999;
+		var sampler = new PointSampler(new FBMNoiseMaterial(new THREE.Color("black"), new THREE.Color("white")), renderer);
+
+		this.bbs = [];
+		for (var pi = 0; pi < numPoints; ++pi) {
+			var p = sampler.sample();
+
+			p.multiplyScalar(radius);
+
+ 	  		var b = billboard.clone();
+
+ 			b.position.x = p.x;
+ 			b.position.y = p.y;
+ 			b.position.z = p.z;
+
+ 			b.lookAt(new THREE.Vector3(0, 0, 0));
+
+ 			b.updateMatrix();
+ 			b.matrixAutoUpdate = false;
+ 			scene.add(b);
+			this.bbs.push(b);
+		}
+	}
+
+	public animate(camera : THREE.Camera) {
+
+		var xCam = new THREE.Vector3();
+		var yCam = new THREE.Vector3();
+		var zCam = new THREE.Vector3();
+
+		camera.matrixWorld.extractBasis( xCam, yCam, zCam );		
+
+		var xBill = new THREE.Vector3();
+		var yBill = new THREE.Vector3();
+		var zBill = new THREE.Vector3();
+
+		for (var i = 0; i < this.bbs.length; ++i) {
+			
+			this.bbs[i].matrix.extractBasis( xBill, yBill, zBill);			
+			var pos = this.bbs[i].getWorldPosition();
+
+			xBill.crossVectors(yCam, zBill);
+			xBill.normalize();
+			yBill.crossVectors(zBill, xBill);
+
+			this.bbs[i].matrix.makeBasis(xBill, yBill, zBill);
+			this.bbs[i].matrix.setPosition(pos);
+		}
+	}
+
+	private bbs : THREE.Mesh[];
 }
