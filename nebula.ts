@@ -35,57 +35,109 @@ import { Billboards } from './billboard';
 
 var renderer: THREE.WebGLRenderer;
 var camera: THREE.PerspectiveCamera;
-var controls: THREE.OrbitControls;	
+var controls: THREE.OrbitControls;
+
+var scene = new THREE.Scene();
 
 var app: ng.IModule = angular.module('Nebula.App', []);
 
-window.onload = () => {
+declare var Blockly: any;
 
-	var view = document.getElementById("nebula-view");
-	var blockly = document.getElementById("blockly-div");
+Blockly.Blocks['space'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Space is");
+    this.setNextStatement(true);
+    Blockly.BlockSvg.START_HAT = true
+  }
+};
 
-	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false});
+
+Blockly.Blocks['noise_fbm'] = {
+   init: function() {
+    this.appendDummyInput()
+        .appendField("Noise FBM");
+    this.setPreviousStatement(true, "COMMAND");
+    this.setNextStatement(true, "COMMAND");
+  }
+};
+
+Blockly.Blocks['noise_ridged'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Noise Ridged");
+    this.setPreviousStatement(true, "COMMAND");
+    this.setNextStatement(true, "COMMAND");
+  }
+};
+
+Blockly.Blocks['stars'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Stars");
+    this.setPreviousStatement(true, "COMMAND");
+    this.setNextStatement(true, "COMMAND");
+  }
+};
+
+Blockly.Blocks['billboards'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Billboards");
+    this.setPreviousStatement(true, "COMMAND");
+    this.setNextStatement(true, "COMMAND");
+  }
+};
+
+var view = document.getElementById("nebula-view");
+var blockly = document.getElementById("blockly-div");
+var workspace : any;
+
+function updateScene() : void {
+
+}
+
+function doResize(): void {
+	var w = view.offsetWidth, h = window.innerHeight - document.getElementById("header").offsetHeight;
+	w *= 0.95;
+	h *= 0.95;
+	renderer.setSize(w, h);
+	blockly.style.height = h + "px";
+	Blockly.svgResize(workspace);
+	camera.updateProjectionMatrix();
+}	
+
+window.addEventListener('resize', doResize);
+window.addEventListener('load', () => {
+
+	workspace = Blockly.inject('blockly-div',
+    {media: 'bower_components/google-blockly/media/',
+     toolbox: document.getElementById('blockly-toolbox')});
+
+	workspace.addChangeListener(updateScene);
+	// workspace.addChangeListener(Blockly.Events.disableOrphans);
+		
+	renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 	renderer.setPixelRatio(window.devicePixelRatio);
 
 	camera = new THREE.PerspectiveCamera(30, 1, 0.1, 10000);	
 	camera.position.z = 0.01;
-
-	function doResize(): void {
-		var w = view.offsetWidth, h = window.innerHeight - document.getElementById("header").offsetHeight;
-		w *= 0.95;
-		h *= 0.95;
-		renderer.setSize(w, h);
-		blockly.style.height = h + "px";
-		camera.updateProjectionMatrix();
-	}	
-	window.addEventListener('resize', doResize, false);
-	doResize();
-
+		
 	view.appendChild(renderer.domElement);
-
-	var scene = new THREE.Scene();
-
+	
 	scene.add(camera);
-
-	var background = new THREE.Mesh(
-		new THREE.SphereGeometry(2, 64, 64),
-		new THREE.MeshPhongMaterial({
-			color: "white",
-			side: THREE.BackSide,
-			depthTest: false, 
-			depthWrite: false })
-	);
-
-	scene.add(background);		
-	scene.add(new  THREE.Mesh(
-				new THREE.SphereGeometry(1, 64, 64),
+	
+	scene.add(new THREE.Mesh(
+				new THREE.SphereGeometry(1, 8, 8),
 				new FBMNoiseMaterial(
 					new THREE.Color(255/255, 0/255, 153/255),
-					new THREE.Color(1 / 255, 79 / 255, 91 / 255)
+					new THREE.Color(1 / 255, 79 / 255, 91 / 255),
+					false
 				)
 	));
-	scene.add(new  THREE.Mesh(
-				new THREE.SphereGeometry(1, 64, 64),
+
+	scene.add(new THREE.Mesh(
+				new THREE.SphereGeometry(1, 8, 8),
 				new RidgedFBMNoiseMaterial(
 					new THREE.Color("black"),
 					new THREE.Color("black")
@@ -97,7 +149,7 @@ window.onload = () => {
 	var bboards = new Billboards(scene, renderer);
 
 	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
-	controls.enablePan = controls.enableZoom = controls.enableKeys = true;
+	controls.enablePan = controls.enableZoom = controls.enableKeys = false;
 	controls.target.set(0, 0, 0);
 
 	renderer.setClearColor(new THREE.Color("white"), 1.0);
@@ -119,7 +171,8 @@ window.onload = () => {
 		lastTime = timeNow;
 	}
 
+	doResize();
 	animate();
-}
+});
 
 

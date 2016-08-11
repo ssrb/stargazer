@@ -146,7 +146,7 @@ require('./shaders/noise_ridged.fs');
 
 export class FBMNoiseMaterial extends THREE.ShaderMaterial {
 
-    public constructor(innerColor: THREE.Color, outerColor: THREE.Color) {
+    public constructor(innerColor: THREE.Color, outerColor: THREE.Color, transparent = true) {
        
         this.textures = new NoiseTextures(132);
 
@@ -167,7 +167,7 @@ export class FBMNoiseMaterial extends THREE.ShaderMaterial {
             vertexShader: require('./shaders/noise.vs')(),            
             fragmentShader: require('./shaders/noise_fbm.fs')(),
             side: THREE.BackSide,
-            transparent: true,
+            transparent: transparent,
             depthTest: false, 
             depthWrite: false
         });
@@ -178,7 +178,7 @@ export class FBMNoiseMaterial extends THREE.ShaderMaterial {
 
 export class RidgedFBMNoiseMaterial extends THREE.ShaderMaterial {
 
-    public constructor(innerColor: THREE.Color, outerColor: THREE.Color) {
+    public constructor(innerColor: THREE.Color, outerColor: THREE.Color, transparent = true) {
        
         this.textures = new NoiseTextures(132);
 
@@ -270,7 +270,7 @@ export class PointSampler {
         var maskScene = new THREE.Scene();
 
         maskScene.add(new THREE.Mesh(
-            new THREE.SphereGeometry(1, 64, 64),
+            new THREE.SphereGeometry(1, 8, 8),
             material
         ));
 

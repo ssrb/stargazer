@@ -65,24 +65,16 @@
 
 <div class="row">	
 		<div class="col-lg-4" id="blockly-div"></div>	
-    	<div class="col-lg-8" id="nebula-view" style="background: white;"></div>
+    	<div class="col-lg-8" id="nebula-view" style="background: black;"></div>
 </div>
 
 <xml id="blockly-toolbox" style="display: none">
-	<block type="controls_if"></block>
-	<block type="logic_compare"></block>
-	<block type="controls_repeat_ext"></block>
-	<block type="math_number"></block>
-	<block type="math_arithmetic"></block>
-	<block type="text"></block>
-	<block type="text_print"></block>
+	<block type="space"></block>
+	<block type="noise_fbm"></block>
+	<block type="noise_ridged"></block>
+	<block type="stars"></block>
+	<block type="billboards"></block>
 </xml>
-
-<script>
-var workspace = Blockly.inject('blockly-div',
-    {media: 'bower_components/google-blockly/media/',
-     toolbox: document.getElementById('blockly-toolbox')});
-</script>
 
 <script src="bundle.js"></script>
 
