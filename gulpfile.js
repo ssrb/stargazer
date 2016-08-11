@@ -5,7 +5,7 @@ var browserifyShader = require("browserify-shader")
 var watchify = require('watchify');
 var tsify = require('tsify');
 var uglify = require('uglifyify');
-var tsd = require('gulp-tsd');
+var typings = require('gulp-typings');
 var runSequence = require('run-sequence');
 var peg = require('gulp-peg');
 var gutil = require('gulp-util');
@@ -20,10 +20,10 @@ gulp.task('.bower.clean', function (cb) {
     del(['lib/'], cb);
 });
 
-gulp.task('.tsd.install', function (callback) {
-	tsd({
+gulp.task('.typings.install', function (callback) {
+	typings({
         command: 'reinstall',
-        config: './tsd.json'
+        config: './typings.json'
     }, callback);
 });
 
@@ -76,7 +76,7 @@ gulp.task('.nebula.release', function() {
 
 gulp.task('default', function(callback) {
     runSequence('.bower.install',
-                '.tsd.install',
+                '.typings.install',
                 '.nebula',
                 callback);
 });
