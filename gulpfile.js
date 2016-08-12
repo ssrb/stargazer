@@ -20,10 +20,7 @@ gulp.task('.bower.clean', function (cb) {
 });
 
 gulp.task('.typings.install', function (callback) {
-	typings({
-        command: 'reinstall',
-        config: './typings.json'
-    }, callback);
+    return gulp.src("./typings.json").pipe(typings());
 });
 
 gulp.task('.npm.clean', function (cb) {
