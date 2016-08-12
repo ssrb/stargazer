@@ -7,7 +7,6 @@ var tsify = require('tsify');
 var uglify = require('uglifyify');
 var typings = require('gulp-typings');
 var runSequence = require('run-sequence');
-var peg = require('gulp-peg');
 var gutil = require('gulp-util');
 
 gulp.task('.bower.install', function () {
