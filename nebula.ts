@@ -43,15 +43,18 @@ var app: ng.IModule = angular.module('Nebula.App', []);
 
 declare var Blockly: any;
 
-Blockly.Blocks['space'] = {
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#54994w
+Blockly.Blocks['nebula'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("Space is");
-    this.setNextStatement(true);
-    Blockly.BlockSvg.START_HAT = true
+        .appendField("Nebula");
+    this.appendStatementInput("Layers")
+        .setCheck("Layer");
+    this.setColour(290);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
   }
 };
-
 
 Blockly.Blocks['noise_fbm'] = {
    init: function() {
@@ -71,12 +74,29 @@ Blockly.Blocks['noise_ridged'] = {
   }
 };
 
+//https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#vnonsr
 Blockly.Blocks['stars'] = {
   init: function() {
     this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
         .appendField("Stars");
-    this.setPreviousStatement(true, "COMMAND");
-    this.setNextStatement(true, "COMMAND");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Size")
+        .appendField(new Blockly.FieldNumber(0, 0), "SIZE");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Near color")
+        .appendField(new Blockly.FieldColour("#ff6600"), "NEAR");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Far color")
+        .appendField(new Blockly.FieldColour("#3366ff"), "FAR");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, "Layer");
+    this.setColour(20);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
   }
 };
 
