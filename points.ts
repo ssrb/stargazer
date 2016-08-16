@@ -32,14 +32,18 @@ import { PointSampler, FBMNoiseMaterial } from "./noise";
 
 export class Points extends THREE.Points {
 
-	public constructor(renderer : THREE.WebGLRenderer) {
+	public constructor(
+		renderer : THREE.WebGLRenderer,
+		seed: string,
+		numPoints : number,
+		// size : 
+		near : THREE.Color,
+		far : THREE.Color) {
 
 		var geometry = new THREE.Geometry();
 		
-		var rand = seedrandom(132);
-
-		var far = new THREE.Color("white"), near = new THREE.Color("blue");
-		var numPoints = 1000;	
+		var rand = seedrandom(seed);
+		
 		var radius = 0.999;
 
 		var sampler = new PointSampler(new FBMNoiseMaterial(new THREE.Color("black"), new THREE.Color("white"), false), renderer);

@@ -22,6 +22,7 @@
 
   	<script type="text/javascript" src="bower_components/google-blockly/blockly_compressed.js"></script>
   	<script type="text/javascript" src="bower_components/google-blockly/blocks_compressed.js"></script>
+	<script type="text/javascript" src="bower_components/google-blockly/javascript_compressed.js"></script>
   	<script type="text/javascript" src="bower_components/google-blockly/msg/js/en.js"></script>
 
 	<style>
@@ -70,10 +71,13 @@
 
 <xml id="blockly-toolbox" style="display: none">
 	<block type="nebula"></block>
-	<block type="noise_fbm"></block>
-	<block type="noise_ridged"></block>
-	<block type="stars"></block>
-	<block type="billboards"></block>
+	<block type="gas"></block>	
+	<block type="dwarf_stars"></block>
+	<block type="giant_stars"></block>
+</xml>
+
+<xml id="blockly-startBlocks" style="display: none">
+    <block type="nebula" deletable="false" x="100" y="100"/>
 </xml>
 
 <script src="bundle.js"></script>
