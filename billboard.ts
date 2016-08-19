@@ -48,7 +48,7 @@ export class Billboards {
 
 		var numPoints = 100;	
 		var radius = 0.999;
-		var sampler = new PointSampler(new FBMNoiseMaterial(new THREE.Color("black"), new THREE.Color("white"), false), renderer);
+		var sampler = new PointSampler(new FBMNoiseMaterial(new THREE.Color("black"), new THREE.Color("white"), false), renderer, 512, "entropy");
 
 		this.bbs = [];
 		for (var pi = 0; pi < numPoints; ++pi) {

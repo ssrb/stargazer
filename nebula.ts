@@ -154,20 +154,14 @@ Blockly.Blocks['dwarf_stars'] = {
   }
 };
 
-Blockly.JavaScript['dwarf_stars'] = function(block) {
-	// Search the text for a substring.
-	// var operator = block.getFieldValue('END') == 'FIRST' ? 'indexOf' : 'lastIndexOf';
-	// var subString = Blockly.JavaScript.valueToCode(block, 'FIND',
-	//     Blockly.JavaScript.ORDER_NONE) || '\'\'';
-	// var text = Blockly.JavaScript.valueToCode(block, 'VALUE',
-	//     Blockly.JavaScript.ORDER_MEMBER) || '\'\'';
-	// var code = text + '.' + operator + '(' + subString + ')';		
+Blockly.JavaScript['dwarf_stars'] = function(block) {		
 	scene.add(new Points(
 		renderer,
-		"entropy",
-		1000,	
-		new THREE.Color("white"),
-		new THREE.Color("blue")
+		block.getFieldValue('SEED'),
+		block.getFieldValue('CARDINALITY'),
+		block.getFieldValue('SIZE'),	
+		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
+		new THREE.Color(block.getFieldValue('FAR_COLOR'))
 	));
 	return "";
 };

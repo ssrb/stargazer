@@ -212,11 +212,11 @@ export class RidgedFBMNoiseMaterial extends THREE.ShaderMaterial {
 
 export class PointSampler {
 
-    public constructor(material : THREE.ShaderMaterial, renderer : THREE.WebGLRenderer, maskSize = 512)
+    public constructor(material : THREE.ShaderMaterial, renderer : THREE.WebGLRenderer, maskSize = 512, seed : string)
     {
         this.maskSize = maskSize;
         this.faces = PointSampler.RenderFaces(material, renderer, maskSize);
-        this.rand = seedrandom(132);
+        this.rand = seedrandom(seed);
     }
 
     public sample(threshold = 0, maxtest = 10) : THREE.Vector3 {

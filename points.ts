@@ -36,7 +36,7 @@ export class Points extends THREE.Points {
 		renderer : THREE.WebGLRenderer,
 		seed: string,
 		numPoints : number,
-		// size : 
+		size : number,
 		near : THREE.Color,
 		far : THREE.Color) {
 
@@ -46,7 +46,7 @@ export class Points extends THREE.Points {
 		
 		var radius = 0.999;
 
-		var sampler = new PointSampler(new FBMNoiseMaterial(new THREE.Color("black"), new THREE.Color("white"), false), renderer);
+		var sampler = new PointSampler(new FBMNoiseMaterial(new THREE.Color("black"), new THREE.Color("white"), false), renderer, 512, seed);
 
 		for (var pi = 0; pi < numPoints; ++pi) {
 			var p = sampler.sample(0.1);
@@ -60,7 +60,7 @@ export class Points extends THREE.Points {
 		super(
 			geometry, 
 			new THREE.PointsMaterial({
-				size: 0.0001, 
+				size: size,
 				vertexColors: THREE.VertexColors, 
 				side: THREE.BackSide, 
 				transparent: true, 
