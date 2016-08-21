@@ -30,7 +30,7 @@ var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
 class NoiseData {
    
-    public constructor(seed: number) {	
+    public constructor(seed: string) {	
         var grad3: number[][] = [
             [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
             [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
@@ -95,7 +95,7 @@ class NoiseData {
 }
 
 class NoiseTextures {
-    public constructor(seed : number) {
+    public constructor(seed : string) {
 
         this.noiseData = new NoiseData(seed);
 
@@ -146,9 +146,9 @@ require('./shaders/noise_ridged.fs');
 
 export class FBMNoiseMaterial extends THREE.ShaderMaterial {
 
-    public constructor(innerColor: THREE.Color, outerColor: THREE.Color, transparent = true) {
+    public constructor(seed: string, innerColor: THREE.Color, outerColor: THREE.Color, transparent = true) {
        
-        this.textures = new NoiseTextures(132);
+        this.textures = new NoiseTextures(seed);
 
         super({
             uniforms: {
@@ -178,9 +178,9 @@ export class FBMNoiseMaterial extends THREE.ShaderMaterial {
 
 export class RidgedFBMNoiseMaterial extends THREE.ShaderMaterial {
 
-    public constructor(innerColor: THREE.Color, outerColor: THREE.Color, transparent = true) {
+    public constructor(seed: string, innerColor: THREE.Color, outerColor: THREE.Color, transparent = true) {
        
-        this.textures = new NoiseTextures(132);
+        this.textures = new NoiseTextures(seed);
 
         super({
             uniforms: {

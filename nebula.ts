@@ -29,35 +29,23 @@
 
 var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
+import './blocks';
 import { Points } from './points';
 import { FBMNoiseMaterial, RidgedFBMNoiseMaterial } from './noise';
 import { Billboards } from './billboard';
 
-var renderer: THREE.WebGLRenderer;
-var camera: THREE.PerspectiveCamera;
-var controls: THREE.OrbitControls;
+var renderer : THREE.WebGLRenderer;
+var camera : THREE.PerspectiveCamera;
+var controls : THREE.OrbitControls;
 
 var scene = new THREE.Scene();
 var bboards : Billboards;
 
-var app: ng.IModule = angular.module('Nebula.App', []);
-
 declare var Blockly: any;
 
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#54994w
-Blockly.Blocks['nebula'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("Nebula");
-    this.appendStatementInput("Layers")
-        .setCheck("Layer");
-    this.setColour(290);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
+var Nebula = [];
 
-Blockly.JavaScript['nebula'] = function(block) {
+Nebula['nebula'] = (block) => {
 
 	scene = new THREE.Scene();
 
@@ -68,158 +56,72 @@ Blockly.JavaScript['nebula'] = function(block) {
 	return "";
 };
 
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#zt3k3v
-Blockly.Blocks['gas'] = {
-  init: function() {
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_CENTRE)
-        .appendField("Gas");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Seed")
-        .appendField(new Blockly.FieldTextInput("entropy"), "SEED");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Near color")
-        .appendField(new Blockly.FieldColour("#ff6600"), "NEAR_COLOR");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Far color")
-        .appendField(new Blockly.FieldColour("#3366ff"), "FAR_COLOR");
-    this.setPreviousStatement(true, ["Nebula", "Layer"]);
-    this.setNextStatement(true, "Layer");
-    this.setColour(20);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.JavaScript['gas'] = function(block) {
-
-	scene.add(new THREE.Mesh(
-				new THREE.SphereGeometry(1, 8, 8),
-				new FBMNoiseMaterial(
-					new THREE.Color(255/255, 0/255, 153/255),
-					new THREE.Color(1 / 255, 79 / 255, 91 / 255),
-					false
-				)
-	));
-
-	scene.add(new THREE.Mesh(
-				new THREE.SphereGeometry(1, 8, 8),
-				new RidgedFBMNoiseMaterial(
-					new THREE.Color("black"),
-					new THREE.Color("black")
-				)
-	));
+Nebula['gas'] = (block) => {
 	
-	return "";
+	var mixblock = block.getInputTargetBlock("MIX");
+
+	scene.add(new THREE.Mesh(
+				new THREE.SphereGeometry(1, 8, 8),
+				Nebula[mixblock.type](
+					mixblock, 
+					new THREE.Color(block.getFieldValue('INNER_COLOR')),
+					new THREE.Color(block.getFieldValue('OUTER_COLOR'))
+				)
+	));
 };
 
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#u99ymr
-Blockly.Blocks['dwarf_stars'] = {
-  init: function() {
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_CENTRE)
-        .appendField("Dwarf Stars");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Seed")
-        .appendField(new Blockly.FieldTextInput("entropy"), "SEED");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Cardinality")
-        .appendField(new Blockly.FieldNumber(0, 0), "CARDINALITY");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Size")
-        .appendField(new Blockly.FieldNumber(0, 0), "SIZE");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Near color")
-        .appendField(new Blockly.FieldColour("#ff6600"), "NEAR_COLOR");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Far color")
-        .appendField(new Blockly.FieldColour("#3366ff"), "FAR_COLOR");
-    this.appendValueInput("MASK")
-        .setCheck("Mask")
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Mask");
-    this.setPreviousStatement(true, ["Nebula", "Layer"]);
-    this.setNextStatement(true, "Layer");
-    this.setColour(20);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.JavaScript['dwarf_stars'] = function(block) {		
+Nebula['dwarf_stars'] = (block) => {
 	scene.add(new Points(
 		renderer,
 		block.getFieldValue('SEED'),
 		block.getFieldValue('CARDINALITY'),
 		block.getFieldValue('SIZE'),	
 		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
-		new THREE.Color(block.getFieldValue('FAR_COLOR'))
+		new THREE.Color(block.getFieldValue('FAR_COLOR'))		
 	));
-	return "";
 };
 
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#im2r56
-Blockly.Blocks['giant_stars'] = {
-  init: function() {
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_CENTRE)
-        .appendField("Giant Stars");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Seed")
-        .appendField(new Blockly.FieldTextInput("entropy"), "SEED");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Cardinality")
-        .appendField(new Blockly.FieldNumber(0, 0), "CARDINALITY");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Size")
-        .appendField(new Blockly.FieldNumber(0, 0), "SIZE");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Near color")
-        .appendField(new Blockly.FieldColour("#ff6600"), "NEAR_COLOR");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Far color")
-        .appendField(new Blockly.FieldColour("#3366ff"), "FAR_COLOR");
-    this.appendValueInput("MASK")
-        .setCheck("Mask")
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Mask");
-    this.setPreviousStatement(true, ["Nebula", "Layer"]);
-    this.setNextStatement(true, "Layer");
-    this.setColour(290);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
+Nebula['giant_stars'] = (block) => {
+	bboards = new Billboards(
+		scene, 
+		renderer,
+		block.getFieldValue('SEED'),
+		block.getFieldValue('CARDINALITY'),
+		block.getFieldValue('SIZE'),	
+		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
+		new THREE.Color(block.getFieldValue('FAR_COLOR'))
+	);
 };
 
-Blockly.JavaScript['giant_stars'] = function(block) {
-	bboards = new Billboards(scene, renderer);
-	return "";
+Nebula['fbm_noise'] = (block, inner = new THREE.Color("black"), outer = new THREE.Color("black")) => {
+	return new RidgedFBMNoiseMaterial(
+					"entropy",
+					inner,
+					outer
+				);
 };
 
 var view = document.getElementById("nebula-view");
 var blockly = document.getElementById("blockly-div");
 var workspace : any;
 
-function updateScene() : void {    
-    var code = Blockly.JavaScript.workspaceToCode(workspace);
-    console.log(code);
-	try {
-		eval(code);
-	} catch (e) {
-		alert(e);
+function getRootBlock() {
+  var blocks = workspace.getTopBlocks(false);
+  for (var i = 0, block; block = blocks[i]; i++) {
+    if (block.type == 'nebula') {
+      return block;
+    }
+  }
+  return null;
+}
+
+function updateScene() : void {
+	scene = new THREE.Scene();
+	scene.add(camera);
+    var nebula = getRootBlock();    
+    for (var block = nebula.getInputTargetBlock("Layers"); block; block = block.nextConnection && block.nextConnection.targetBlock()) 
+    {
+		Nebula[block.type](block); 		
 	}
 }
 

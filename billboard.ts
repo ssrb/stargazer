@@ -31,7 +31,14 @@ import { PointSampler, FBMNoiseMaterial } from "./noise";
 
 export class Billboards {
 
-	public constructor(scene: THREE.Scene, renderer : THREE.WebGLRenderer) {
+	public constructor(
+		scene: THREE.Scene, 
+		renderer : THREE.WebGLRenderer,
+		seed: string,
+		numBillboards : number,
+		size : number,
+		near : THREE.Color,
+		far : THREE.Color) {
 
 	 	var textureLoader = new THREE.TextureLoader();
 	 	var texture = textureLoader.load( "images/flare-blue-purple2.png" );
@@ -45,13 +52,12 @@ export class Billboards {
 				depthTest: false, 
 				depthWrite: false
 			}));	
-
-		var numPoints = 100;	
+		
 		var radius = 0.999;
-		var sampler = new PointSampler(new FBMNoiseMaterial(new THREE.Color("black"), new THREE.Color("white"), false), renderer, 512, "entropy");
+		var sampler = new PointSampler(new FBMNoiseMaterial(seed, new THREE.Color("black"), new THREE.Color("white"), false), renderer, 512, seed);
 
 		this.bbs = [];
-		for (var pi = 0; pi < numPoints; ++pi) {
+		for (var pi = 0; pi < numBillboards; ++pi) {
 			var p = sampler.sample(0.1);
 
 			p.multiplyScalar(radius);

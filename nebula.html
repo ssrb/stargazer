@@ -12,10 +12,7 @@
 
 	<!-- Bootstrap CSS layout -->
 	<link rel="stylesheet" type="text/css"  href="bower_components/bootstrap/dist/css/bootstrap.css"/>
-
-	<!-- Angular -->
-	<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
-
+	
 	<!-- Three -->
 	<script type="text/javascript" src="bower_components/three.js/three.js"></script>
 	<script type="text/javascript" src="OrbitControls.js"></script>
@@ -69,11 +66,16 @@
     	<div class="col-lg-8" id="nebula-view" style="background: black;"></div>
 </div>
 
-<xml id="blockly-toolbox" style="display: none">
-	<block type="nebula"></block>
-	<block type="gas"></block>	
-	<block type="dwarf_stars"></block>
-	<block type="giant_stars"></block>
+<xml id="blockly-toolbox" style="display: none">	
+	<category name="Stars & gas" colour="290">
+		<block type="gas"></block>	
+		<block type="dwarf_stars"></block>
+		<block type="giant_stars"></block>
+	</category>	
+	<category name="Noise" colour="20">
+		<block type="fbm_noise"></block>
+	</category>
+	
 </xml>
 
 <xml id="blockly-startBlocks" style="display: none">
