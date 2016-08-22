@@ -3,7 +3,7 @@ set -e # exit with nonzero exit code if anything fails
 	if [[ $TRAVIS ]]; then
 	mkdir _site
 	cd _site
-	cp ../nebula.html .
+	cp ../stargazer.html .
 	cp ../bundle.js ../OrbitControls.js .
 	cp -r ../bower_components .
 	#cp -r ../examples .
@@ -20,7 +20,7 @@ set -e # exit with nonzero exit code if anything fails
 	# repo's gh-pages branch. (All previous history on the gh-pages branch
 	# will be lost, since we are overwriting it.) We redirect any output to
 	# /dev/null to hide any sensitive credential data that might otherwise be exposed.
-	git push --force --quiet git@github.com:ssrb/nebula.git master:gh-pages > /dev/null 2>&1
+	git push --force --quiet git@github.com:ssrb/stargazer.git master:gh-pages > /dev/null 2>&1
 else
   echo 'You are not running Travis-CI!'
 fi
