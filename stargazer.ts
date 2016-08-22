@@ -158,7 +158,7 @@ var workspace : any;
 function getRootBlock() {
   var blocks = workspace.getTopBlocks(false);
   for (var i = 0, block; block = blocks[i]; i++) {
-    if (block.type == 'nebula') {
+    if (block.type == 'starsystem') {
       return block;
     }
   }

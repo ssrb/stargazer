@@ -29,11 +29,11 @@
 
 declare var Blockly: any;
 
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#54994w
-Blockly.Blocks['nebula'] = {
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#ervz52
+Blockly.Blocks['starsystem'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("Nebula");
+        .appendField("Star System");
     this.appendStatementInput("Layers")
         .setCheck("Layer");
     this.setColour(290);
