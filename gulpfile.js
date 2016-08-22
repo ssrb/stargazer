@@ -30,7 +30,7 @@ gulp.task('.npm.clean', function (cb) {
 
 gulp.task('watch', function() {
     var bundler = watchify(browserify({debug: true})
-        .add('nebula.ts')
+        .add('stargazer.ts')
         .plugin(tsify)
         .transform(browserifyShader));
 
@@ -45,9 +45,9 @@ gulp.task('watch', function() {
     return rebundle();
 });
 
-gulp.task('.nebula', function() {
+gulp.task('.stargazer', function() {
     var bundler = browserify({debug: true})
-        .add('./nebula.ts')
+        .add('./stargazer.ts')
         .plugin(tsify)
         .transform(browserifyShader)
         .transform('brfs')
@@ -57,9 +57,9 @@ gulp.task('.nebula', function() {
         .pipe(gulp.dest('.'));
 });
 
-gulp.task('.nebula.release', function() {
+gulp.task('.stargazer.release', function() {
     var bundler = browserify()
-        .add('./nebula.ts')
+        .add('./stargazer.ts')
         .plugin(tsify)
         .transform(browserifyShader)
         .transform('brfs')
@@ -73,7 +73,7 @@ gulp.task('.nebula.release', function() {
 gulp.task('default', function(callback) {
     runSequence('.bower.install',
                 '.typings.install',
-                '.nebula',
+                '.stargazer',
                 callback);
 });
 

@@ -43,9 +43,9 @@ var bboards : Billboards;
 
 declare var Blockly: any;
 
-var Nebula = [];
+var Layers = [];
 
-Nebula['nebula'] = (block) => {
+Layers['nebula'] = (block) => {
 
 	scene = new THREE.Scene();
 
@@ -54,13 +54,13 @@ Nebula['nebula'] = (block) => {
 	Blockly.JavaScript.statementToCode(block, 'Layers');
 };
 
-Nebula['gas'] = (block) => {
+Layers['gas'] = (block) => {
 	
 	var mixblock = block.getInputTargetBlock("MIX");
 	
 	return mixblock ? new THREE.Mesh(
 				new THREE.SphereGeometry(1, 8, 8),
-				Nebula[mixblock.type](
+				Layers[mixblock.type](
 					mixblock, 
 					new THREE.Color(block.getFieldValue('INNER_COLOR')),
 					new THREE.Color(block.getFieldValue('OUTER_COLOR'))
@@ -68,7 +68,7 @@ Nebula['gas'] = (block) => {
 	) : null;
 };
 
-Nebula['dwarf_stars'] = (block) => {
+Layers['dwarf_stars'] = (block) => {
 
 	var maskblock = block.getInputTargetBlock("MASK");
 
@@ -76,7 +76,7 @@ Nebula['dwarf_stars'] = (block) => {
 		return null;
 	}
 
-	var mask = Nebula[maskblock.type](
+	var mask = Layers[maskblock.type](
 		maskblock,	
 		new THREE.Color("black"), 
 		new THREE.Color("white")		
@@ -94,7 +94,7 @@ Nebula['dwarf_stars'] = (block) => {
 	);
 };
 
-Nebula['giant_stars'] = (block) => {
+Layers['giant_stars'] = (block) => {
 
 	var maskblock = block.getInputTargetBlock("MASK");
 
@@ -102,7 +102,7 @@ Nebula['giant_stars'] = (block) => {
 		return null;
 	}
 
-	var mask = Nebula[maskblock.type](
+	var mask = Layers[maskblock.type](
 		maskblock,	
 		new THREE.Color("black"), 
 		new THREE.Color("white")		
@@ -120,7 +120,7 @@ Nebula['giant_stars'] = (block) => {
 	);
 };
 
-Nebula['fbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
+Layers['fbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 	return new FBMNoiseMaterial(
 					block.getFieldValue('SEED'),
 					inner,
@@ -135,7 +135,7 @@ Nebula['fbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 				);
 };
 
-Nebula['rfbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
+Layers['rfbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 	return new RidgedFBMNoiseMaterial(
 					block.getFieldValue('SEED'),
 					inner,
@@ -168,11 +168,11 @@ function getRootBlock() {
 function updateScene() : void {
 	scene = new THREE.Scene();
 	scene.add(camera);
-    var nebula = getRootBlock();      
-    for (var block = nebula.getInputTargetBlock("Layers"), first = true; block; block = block.nextConnection && block.nextConnection.targetBlock()) 
+    var root = getRootBlock();      
+    for (var block = root.getInputTargetBlock("Layers"), first = true; block; block = block.nextConnection && block.nextConnection.targetBlock()) 
     {
     	if (!block.disabled) {
-			var layer = Nebula[block.type](block);
+			var layer = Layers[block.type](block);
 			if (layer) {
 				if (first) {
 					layer.material.transparent = false;
