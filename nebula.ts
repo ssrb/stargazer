@@ -31,7 +31,7 @@ var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
 import './blocks';
 import { Points } from './points';
-import { FBMNoiseMaterial, RidgedFBMNoiseMaterial } from './noise';
+import { PointSampler, FBMNoiseMaterial, RidgedFBMNoiseMaterial } from './noise';
 import { Billboards } from './billboard';
 
 var renderer : THREE.WebGLRenderer;
@@ -52,52 +52,102 @@ Nebula['nebula'] = (block) => {
 	scene.add(camera);
 	
 	Blockly.JavaScript.statementToCode(block, 'Layers');
-	
-	return "";
 };
 
 Nebula['gas'] = (block) => {
 	
 	var mixblock = block.getInputTargetBlock("MIX");
-
-	scene.add(new THREE.Mesh(
+	
+	return mixblock ? new THREE.Mesh(
 				new THREE.SphereGeometry(1, 8, 8),
 				Nebula[mixblock.type](
 					mixblock, 
 					new THREE.Color(block.getFieldValue('INNER_COLOR')),
 					new THREE.Color(block.getFieldValue('OUTER_COLOR'))
 				)
-	));
+	) : null;
 };
 
 Nebula['dwarf_stars'] = (block) => {
-	scene.add(new Points(
-		renderer,
-		block.getFieldValue('SEED'),
+
+	var maskblock = block.getInputTargetBlock("MASK");
+
+	if (!maskblock) {
+		return null;
+	}
+
+	var mask = Nebula[maskblock.type](
+		maskblock,	
+		new THREE.Color("black"), 
+		new THREE.Color("white")		
+	);
+
+	var seed = block.getFieldValue('SEED');
+	
+	return new Points(
+		new PointSampler(mask, renderer, 512, seed),
+		seed,
 		block.getFieldValue('CARDINALITY'),
 		block.getFieldValue('SIZE'),	
 		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
 		new THREE.Color(block.getFieldValue('FAR_COLOR'))		
-	));
+	);
 };
 
 Nebula['giant_stars'] = (block) => {
-	bboards = new Billboards(
-		scene, 
-		renderer,
-		block.getFieldValue('SEED'),
+
+	var maskblock = block.getInputTargetBlock("MASK");
+
+	if (!maskblock) {
+		return null;
+	}
+
+	var mask = Nebula[maskblock.type](
+		maskblock,	
+		new THREE.Color("black"), 
+		new THREE.Color("white")		
+	);
+
+	var seed = block.getFieldValue('SEED');
+
+	return new Billboards(		
+		seed,		
 		block.getFieldValue('CARDINALITY'),
+		new PointSampler(mask, renderer, 512, seed),
 		block.getFieldValue('SIZE'),	
 		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
 		new THREE.Color(block.getFieldValue('FAR_COLOR'))
 	);
 };
 
-Nebula['fbm_noise'] = (block, inner = new THREE.Color("black"), outer = new THREE.Color("black")) => {
-	return new RidgedFBMNoiseMaterial(
-					"entropy",
+Nebula['fbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
+	return new FBMNoiseMaterial(
+					block.getFieldValue('SEED'),
 					inner,
-					outer
+					outer,
+					block.getFieldValue('DITHER'),
+					block.getFieldValue('GAIN'),
+					block.getFieldValue('LACURNARITY'),					
+					block.getFieldValue('OCTAVES'),
+					block.getFieldValue('POWER'),
+					block.getFieldValue('SHELF'),
+					block.getFieldValue('SCALE')					
+				);
+};
+
+Nebula['rfbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
+	return new RidgedFBMNoiseMaterial(
+					block.getFieldValue('SEED'),
+					inner,
+					outer,
+					block.getFieldValue('DITHER'),
+					block.getFieldValue('GAIN'),
+					block.getFieldValue('LACURNARITY'),
+					block.getFieldValue('OFFSET'),
+					block.getFieldValue('OCTAVES'),
+					block.getFieldValue('POWER'),
+					block.getFieldValue('SHELF'),
+					block.getFieldValue('SCALE')					
 				);
 };
 
@@ -118,10 +168,19 @@ function getRootBlock() {
 function updateScene() : void {
 	scene = new THREE.Scene();
 	scene.add(camera);
-    var nebula = getRootBlock();    
-    for (var block = nebula.getInputTargetBlock("Layers"); block; block = block.nextConnection && block.nextConnection.targetBlock()) 
+    var nebula = getRootBlock();      
+    for (var block = nebula.getInputTargetBlock("Layers"), first = true; block; block = block.nextConnection && block.nextConnection.targetBlock()) 
     {
-		Nebula[block.type](block); 		
+    	if (!block.disabled) {
+			var layer = Nebula[block.type](block);
+			if (layer) {
+				if (first) {
+					layer.material.transparent = false;
+					first = false;
+				}
+				scene.add(layer);			
+			}
+		}
 	}
 }
 
@@ -133,13 +192,20 @@ function doResize(): void {
 	blockly.style.height = h + "px";
 	Blockly.svgResize(workspace);
 	camera.updateProjectionMatrix();
-}	
+}
 
 window.addEventListener('resize', doResize);
 window.addEventListener('load', () => {
 
 	workspace = Blockly.inject('blockly-div',
     {media: 'bower_components/google-blockly/media/',
+    zoom:
+         {controls: true,
+          wheel: true,
+          startScale: 1.0,
+          maxScale: 3,
+          minScale: 0.3,
+          scaleSpeed: 1.2},
      toolbox: document.getElementById('blockly-toolbox')});
  	Blockly.Xml.domToWorkspace(document.getElementById('blockly-startBlocks'), workspace);
 	workspace.addChangeListener(updateScene);
