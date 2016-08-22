@@ -144,7 +144,7 @@ Blockly.Blocks['giant_stars'] = {
   }
 };
 
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#5u2oqz
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#3i89tn
 Blockly.Blocks['fbm_noise'] = {
   init: function() {
     this.appendDummyInput()
@@ -168,8 +168,45 @@ Blockly.Blocks['fbm_noise'] = {
         .appendField(new Blockly.FieldNumber(1, 0), "SCALE");
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Threshold")
-        .appendField(new Blockly.FieldNumber(0, 0), "THRESHOLD");
+        .appendField("Power")
+        .appendField(new Blockly.FieldNumber(1, 0), "POWER");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Dither")
+        .appendField(new Blockly.FieldNumber(0.03, 0), "DITHER");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Lacunarity")
+        .appendField(new Blockly.FieldNumber(2, 0), "LACUNARITY");
+    this.setOutput(true, null);
+    this.setColour(20);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#7jee6j
+Blockly.Blocks['rfbm_noise'] = {
+  init: function() {
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
+        .appendField("Ridged FBM noise");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Seed")
+        .appendField(new Blockly.FieldTextInput("I ❤ browny"), "SEED");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Octaves")
+        .appendField(new Blockly.FieldNumber(2, 0), "OCTAVES");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Gain")
+        .appendField(new Blockly.FieldNumber(0.5, 0), "GAIN");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Scale")
+        .appendField(new Blockly.FieldNumber(1, 0), "SCALE");
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_RIGHT)
         .appendField("Offset")

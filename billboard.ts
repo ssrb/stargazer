@@ -29,34 +29,34 @@
 
 import { PointSampler, FBMNoiseMaterial } from "./noise";
 
-export class Billboards {
+export class Billboards extends THREE.Mesh {
 
-	public constructor(
-		scene: THREE.Scene, 
-		renderer : THREE.WebGLRenderer,
+	public constructor(		
 		seed: string,
 		numBillboards : number,
+		sampler: PointSampler,
 		size : number,
 		near : THREE.Color,
 		far : THREE.Color) {
-
+		
 	 	var textureLoader = new THREE.TextureLoader();
 	 	var texture = textureLoader.load( "images/flare-blue-purple2.png" );
 			
-		var billboard = new THREE.Mesh( 
-			new THREE.PlaneGeometry(0.1, 0.1), 
-			new THREE.MeshBasicMaterial({
+		super(new THREE.Geometry(), new THREE.MeshBasicMaterial({
 				side: THREE.FrontSide, 
 				map: texture, 
 				transparent: true, 
 				depthTest: false, 
 				depthWrite: false
-			}));	
+			}))
+
+		var billboard = new THREE.Mesh( 
+			new THREE.PlaneGeometry(0.1, 0.1),
+			this.material
+		);	
 		
 		var radius = 0.999;
-		var sampler = new PointSampler(new FBMNoiseMaterial(seed, new THREE.Color("black"), new THREE.Color("white"), false), renderer, 512, seed);
-
-		this.bbs = [];
+				
 		for (var pi = 0; pi < numBillboards; ++pi) {
 			var p = sampler.sample(0.1);
 
@@ -72,8 +72,7 @@ export class Billboards {
 
  			b.updateMatrix();
  			b.matrixAutoUpdate = false;
- 			scene.add(b);
-			this.bbs.push(b);
+ 			this.add(b);			
 		}
 	}
 
@@ -89,19 +88,17 @@ export class Billboards {
 		var yBill = new THREE.Vector3();
 		var zBill = new THREE.Vector3();
 
-		for (var i = 0; i < this.bbs.length; ++i) {
+		for (var i = 0; i < this.children.length; ++i) {
 			
-			this.bbs[i].matrix.extractBasis( xBill, yBill, zBill);			
-			var pos = this.bbs[i].getWorldPosition();
+			this.children[i].matrix.extractBasis( xBill, yBill, zBill);			
+			var pos = this.children[i].getWorldPosition();
 
 			xBill.crossVectors(yCam, zBill);
 			xBill.normalize();
 			yBill.crossVectors(zBill, xBill);
 
-			this.bbs[i].matrix.makeBasis(xBill, yBill, zBill);
-			this.bbs[i].matrix.setPosition(pos);
+			this.children[i].matrix.makeBasis(xBill, yBill, zBill);
+			this.children[i].matrix.setPosition(pos);
 		}
 	}
-
-	private bbs : THREE.Mesh[];
 }

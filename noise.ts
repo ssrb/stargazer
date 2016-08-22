@@ -146,28 +146,38 @@ require('./shaders/noise_ridged.fs');
 
 export class FBMNoiseMaterial extends THREE.ShaderMaterial {
 
-    public constructor(seed: string, innerColor: THREE.Color, outerColor: THREE.Color, transparent = true) {
+    public constructor(
+        seed: string, 
+        innerColor: THREE.Color, 
+        outerColor: THREE.Color, 
+        ditherAmt: number,
+        gain: number,
+        lacunarity: number,
+        octaves: number,
+        powerAmt: number,
+        shelfAmt: number,
+        noiseScale: number) {
        
         this.textures = new NoiseTextures(seed);
 
         super({
             uniforms: {
-                permTexture: { value: this.textures.permTexture},
-                gradTexture: { value: this.textures.gradTexture},
-                ditherAmt: { value: 0.03},
-                gain: { value: 0.5},
+                permTexture: { value: this.textures.permTexture },
+                gradTexture: { value: this.textures.gradTexture },
+                ditherAmt: { value: ditherAmt },
+                gain: { value: gain },
                 innerColor: { value: innerColor },
-                lacunarity: { value: 2.0},
-                octaves: { value: 8},
+                lacunarity: { value: lacunarity },
+                octaves: { value: octaves },
                 outerColor: { value: outerColor },
-                powerAmt: { value: 1.0},
-                shelfAmt: { value: 0.0},
-                noiseScale: { value: 1.0}
+                powerAmt: { value: powerAmt },
+                shelfAmt: { value: shelfAmt },
+                noiseScale: { value: noiseScale }
             },            
             vertexShader: require('./shaders/noise.vs')(),            
             fragmentShader: require('./shaders/noise_fbm.fs')(),
             side: THREE.BackSide,
-            transparent: transparent,
+            transparent: true,
             depthTest: false, 
             depthWrite: false
         });
@@ -178,7 +188,18 @@ export class FBMNoiseMaterial extends THREE.ShaderMaterial {
 
 export class RidgedFBMNoiseMaterial extends THREE.ShaderMaterial {
 
-    public constructor(seed: string, innerColor: THREE.Color, outerColor: THREE.Color, transparent = true) {
+    public constructor(
+        seed: string, 
+        innerColor: THREE.Color, 
+        outerColor: THREE.Color, 
+        ditherAmt: number,
+        gain: number,
+        lacunarity: number,
+        offset: number,
+        octaves: number,
+        powerAmt: number,
+        shelfAmt: number,
+        noiseScale: number) {
        
         this.textures = new NoiseTextures(seed);
 
@@ -186,16 +207,16 @@ export class RidgedFBMNoiseMaterial extends THREE.ShaderMaterial {
             uniforms: {
                 permTexture: { value: this.textures.permTexture },
                 gradTexture: { value: this.textures.gradTexture },
-                ditherAmt: { value: 0.03 },
-                gain: { value: 0.5 },
+                ditherAmt: { value: ditherAmt },
+                gain: { value: gain },
                 innerColor: { value: innerColor },
-                lacunarity: { value: 2.0 },
-                offset: {value: 1.0},
-                octaves: { value: 7 },
+                lacunarity: { value: lacunarity },
+                offset: {value: offset },
+                octaves: { value: octaves },
                 outerColor: { value: outerColor },
-                powerAmt: { value: 1.0 },
-                shelfAmt: { value: 0.0 },
-                noiseScale: { value: 1.0 }
+                powerAmt: { value: powerAmt },
+                shelfAmt: { value: shelfAmt },
+                noiseScale: { value: noiseScale }
             },
 
             vertexShader: require('./shaders/noise.vs')(),
@@ -269,6 +290,8 @@ export class PointSampler {
         
         var maskScene = new THREE.Scene();
 
+        material.transparent = false;
+
         maskScene.add(new THREE.Mesh(
             new THREE.SphereGeometry(1, 8, 8),
             material
@@ -284,7 +307,7 @@ export class PointSampler {
 
         var gl = renderer.getContext();
         var prevFrameBuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
-        
+
         var faces : Uint8Array[] = [];
         for (var facei = 0; facei < 6; ++facei) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer[facei]);
