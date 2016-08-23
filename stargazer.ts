@@ -60,7 +60,7 @@ Layers['gas'] = (block) => {
 	var mixblock = block.getInputTargetBlock("MIX");
 	
 	return mixblock ? new THREE.Mesh(
-				new THREE.SphereGeometry(1, 16, 16),
+				new THREE.SphereGeometry(1, 8, 8),
 				Layers[mixblock.type](
 					mixblock, 
 					new THREE.Color(block.getFieldValue('INNER_COLOR')),
@@ -132,11 +132,11 @@ Layers['fbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 					outer,
 					block.getFieldValue('DITHER'),
 					block.getFieldValue('GAIN'),
-					block.getFieldValue('LACURNARITY'),					
+					block.getFieldValue('LACUNARITY'),					
 					block.getFieldValue('OCTAVES'),
 					block.getFieldValue('POWER'),
-					block.getFieldValue('SHELF'),
-					block.getFieldValue('SCALE')					
+					0.0,
+					block.getFieldValue('SCALE')
 				);
 };
 
@@ -147,12 +147,12 @@ Layers['rfbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 					outer,
 					block.getFieldValue('DITHER'),
 					block.getFieldValue('GAIN'),
-					block.getFieldValue('LACURNARITY'),
+					block.getFieldValue('LACUNARITY'),
 					block.getFieldValue('OFFSET'),
 					block.getFieldValue('OCTAVES'),
 					block.getFieldValue('POWER'),
-					block.getFieldValue('SHELF'),
-					block.getFieldValue('SCALE')					
+					0.0,
+					block.getFieldValue('SCALE')
 				);
 };
 
