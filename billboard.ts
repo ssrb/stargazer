@@ -27,14 +27,14 @@
 
 ///<reference path="typings/index.d.ts"/>
 
-import { PointSampler, FBMNoiseMaterial } from "./noise";
+import { Sampler } from "./sampler";
 
 export class Billboards extends THREE.Mesh {
 
 	public constructor(		
 		seed: string,
 		numBillboards : number,
-		sampler: PointSampler,
+		sampler: Sampler,
 		size : number,
 		near : THREE.Color,
 		far : THREE.Color) {
@@ -55,10 +55,10 @@ export class Billboards extends THREE.Mesh {
 			this.material
 		);	
 		
-		var radius = 0.999;
+		var radius = 1;
 				
 		for (var pi = 0; pi < numBillboards; ++pi) {
-			var p = sampler.sample(0.1);
+			var p = sampler.sample();
 
 			p.multiplyScalar(radius);
 

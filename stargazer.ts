@@ -31,7 +31,8 @@ var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
 import './blocks';
 import { Points } from './points';
-import { PointSampler, FBMNoiseMaterial, RidgedFBMNoiseMaterial } from './noise';
+import { FBMNoiseMaterial, RidgedFBMNoiseMaterial } from './noise';
+import { Sampler, UniformSampler, CubeMaterialSampler } from './sampler';
 import { Billboards } from './billboard';
 
 var renderer : THREE.WebGLRenderer;
@@ -59,7 +60,7 @@ Layers['gas'] = (block) => {
 	var mixblock = block.getInputTargetBlock("MIX");
 	
 	return mixblock ? new THREE.Mesh(
-				new THREE.SphereGeometry(1, 8, 8),
+				new THREE.SphereGeometry(1, 16, 16),
 				Layers[mixblock.type](
 					mixblock, 
 					new THREE.Color(block.getFieldValue('INNER_COLOR')),
@@ -70,22 +71,24 @@ Layers['gas'] = (block) => {
 
 Layers['dwarf_stars'] = (block) => {
 
+	var seed = block.getFieldValue('SEED');
+
 	var maskblock = block.getInputTargetBlock("MASK");
 
-	if (!maskblock) {
-		return null;
+	var sampler : Sampler;
+	if (maskblock) {
+		var mask = Layers[maskblock.type](
+			maskblock,	
+			new THREE.Color("black"), 
+			new THREE.Color("white")
+		);
+		sampler = new CubeMaterialSampler(mask, renderer, 512, seed, 0.1, 10);
+	} else {
+		sampler = new UniformSampler(seed);
 	}
-
-	var mask = Layers[maskblock.type](
-		maskblock,	
-		new THREE.Color("black"), 
-		new THREE.Color("white")		
-	);
-
-	var seed = block.getFieldValue('SEED');
 	
 	return new Points(
-		new PointSampler(mask, renderer, 512, seed),
+		sampler,
 		seed,
 		block.getFieldValue('CARDINALITY'),
 		block.getFieldValue('SIZE'),	
@@ -98,22 +101,24 @@ Layers['giant_stars'] = (block) => {
 
 	var maskblock = block.getInputTargetBlock("MASK");
 
-	if (!maskblock) {
-		return null;
+	var sampler : Sampler;
+	if (maskblock) {
+		var mask = Layers[maskblock.type](
+			maskblock,	
+			new THREE.Color("black"), 
+			new THREE.Color("white")
+		);
+		sampler = new CubeMaterialSampler(mask, renderer, 512, seed, 0.1, 10);
+	} else {
+		sampler = new UniformSampler(seed);
 	}
-
-	var mask = Layers[maskblock.type](
-		maskblock,	
-		new THREE.Color("black"), 
-		new THREE.Color("white")		
-	);
 
 	var seed = block.getFieldValue('SEED');
 
 	return new Billboards(		
 		seed,		
 		block.getFieldValue('CARDINALITY'),
-		new PointSampler(mask, renderer, 512, seed),
+		sampler,
 		block.getFieldValue('SIZE'),	
 		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
 		new THREE.Color(block.getFieldValue('FAR_COLOR'))

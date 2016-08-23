@@ -28,12 +28,12 @@
 ///<reference path="typings/index.d.ts"/>
 var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
-import { PointSampler, FBMNoiseMaterial } from "./noise";
+import { Sampler } from "./sampler";
 
 export class Points extends THREE.Points {
 
 	public constructor(
-		sampler: PointSampler,
+		sampler: Sampler,
 		seed: string,
 		numPoints : number,
 		size : number,
@@ -44,10 +44,10 @@ export class Points extends THREE.Points {
 		
 		var rand = seedrandom(seed);
 		
-		var radius = 0.999;
+		var radius = 1;
 		
 		for (var pi = 0; pi < numPoints; ++pi) {
-			var p = sampler.sample(0.1);
+			var p = sampler.sample();
 			p.multiplyScalar(radius);
 			geometry.vertices.push(p);
 			geometry.colors.push(
