@@ -144,7 +144,7 @@ Blockly.Blocks['giant_stars'] = {
   }
 };
 
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#3i89tn
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#kev9rm
 Blockly.Blocks['fbm_noise'] = {
   init: function() {
     this.appendDummyInput()
@@ -178,6 +178,10 @@ Blockly.Blocks['fbm_noise'] = {
         .setAlign(Blockly.ALIGN_RIGHT)
         .appendField("Lacunarity")
         .appendField(new Blockly.FieldNumber(2, 0), "LACUNARITY");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Threshold")
+        .appendField(new Blockly.FieldNumber(0, 0), "THRESHOLD");
     this.setOutput(true, null);
     this.setColour(20);
     this.setTooltip('');
@@ -185,7 +189,7 @@ Blockly.Blocks['fbm_noise'] = {
   }
 };
 
-https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#7jee6j
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#s59utj
 Blockly.Blocks['rfbm_noise'] = {
   init: function() {
     this.appendDummyInput()
@@ -223,6 +227,10 @@ Blockly.Blocks['rfbm_noise'] = {
         .setAlign(Blockly.ALIGN_RIGHT)
         .appendField("Lacunarity")
         .appendField(new Blockly.FieldNumber(2, 0), "LACUNARITY");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Threshold")
+        .appendField(new Blockly.FieldNumber(0, 0), "THRESHOLD");
     this.setOutput(true, null);
     this.setColour(20);
     this.setTooltip('');

@@ -135,7 +135,7 @@ Layers['fbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 					block.getFieldValue('LACUNARITY'),					
 					block.getFieldValue('OCTAVES'),
 					block.getFieldValue('POWER'),
-					0.0,
+					block.getFieldValue('THRESHOLD'),
 					block.getFieldValue('SCALE')
 				);
 };
@@ -151,7 +151,7 @@ Layers['rfbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 					block.getFieldValue('OFFSET'),
 					block.getFieldValue('OCTAVES'),
 					block.getFieldValue('POWER'),
-					0.0,
+					block.getFieldValue('THRESHOLD'),
 					block.getFieldValue('SCALE')
 				);
 };
@@ -187,6 +187,10 @@ function updateScene() : void {
 			}
 		}
 	}
+
+	var xml = Blockly.Xml.workspaceToDom(workspace);
+	var xml_text = Blockly.Xml.domToText(xml);
+	console.log(xml_text);
 }
 
 function doResize(): void {
