@@ -86,7 +86,7 @@ export class CubeMaterialSampler implements Sampler {
 
             // now see if the random value is less than the noise value
             // should give us a greater density of points for higher noise values
-            if (this.threshold <= n * n) {
+            if (this.threshold > n) {
                 break;
             }
         }
@@ -96,7 +96,7 @@ export class CubeMaterialSampler implements Sampler {
         CubeMaterialSampler.RotatePoint(p, maxf);
 
         // TODO: properly project back from cube to sphere
-        p.normalize();
+        // p.normalize();
         
         return p;
     }
@@ -128,10 +128,17 @@ export class CubeMaterialSampler implements Sampler {
             gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer[facei]);
             faces[facei] = new Uint8Array(cubeCamera.renderTarget.width * cubeCamera.renderTarget.height * 4);
             gl.readPixels(0, 0, cubeCamera.renderTarget.width, cubeCamera.renderTarget.height, gl.RGBA,gl.UNSIGNED_BYTE, faces[facei]);
+
+            var canvas = <HTMLCanvasElement>document.getElementById("debug-canvas-" + (facei + 1));
+            canvas.height = 256;
+            canvas.width = 256;
+            var ctx = canvas.getContext("2d");           
+            ctx.putImageData(new ImageData(new Uint8ClampedArray(faces[facei]), 512, 512), 0, 0);          
         }
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, prevFrameBuffer);
 
+        
         return faces;
     }
 
