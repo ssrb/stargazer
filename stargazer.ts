@@ -44,6 +44,23 @@ var bboards : Billboards;
 
 declare var Blockly: any;
 
+function getSampler(block, seed) : Sampler {
+
+	var maskblock = block.getInputTargetBlock("MASK");
+
+	var sampler : Sampler;
+	if (maskblock) {
+		var mask = Layers[maskblock.type](
+			maskblock,	
+			new THREE.Color("black"), 
+			new THREE.Color("white")
+		);
+		return new CubeMaterialSampler(mask, renderer, 512, seed, 0.1, 10);
+	}
+
+	return new UniformSampler(seed);
+}
+
 var Layers = [];
 
 Layers['nebula'] = (block) => {
@@ -69,26 +86,14 @@ Layers['gas'] = (block) => {
 	) : null;
 };
 
+
+
 Layers['dwarf_stars'] = (block) => {
 
 	var seed = block.getFieldValue('SEED');
 
-	var maskblock = block.getInputTargetBlock("MASK");
-
-	var sampler : Sampler;
-	if (maskblock) {
-		var mask = Layers[maskblock.type](
-			maskblock,	
-			new THREE.Color("black"), 
-			new THREE.Color("white")
-		);
-		sampler = new CubeMaterialSampler(mask, renderer, 512, seed, 0.1, 10);
-	} else {
-		sampler = new UniformSampler(seed);
-	}
-	
 	return new Points(
-		sampler,
+		getSampler(block, seed),
 		seed,
 		block.getFieldValue('CARDINALITY'),
 		block.getFieldValue('SIZE'),	
@@ -98,27 +103,13 @@ Layers['dwarf_stars'] = (block) => {
 };
 
 Layers['giant_stars'] = (block) => {
-
-	var maskblock = block.getInputTargetBlock("MASK");
-
-	var sampler : Sampler;
-	if (maskblock) {
-		var mask = Layers[maskblock.type](
-			maskblock,	
-			new THREE.Color("black"), 
-			new THREE.Color("white")
-		);
-		sampler = new CubeMaterialSampler(mask, renderer, 512, seed, 0.1, 10);
-	} else {
-		sampler = new UniformSampler(seed);
-	}
-
+	
 	var seed = block.getFieldValue('SEED');
 
 	return new Billboards(		
 		seed,		
 		block.getFieldValue('CARDINALITY'),
-		sampler,
+		getSampler(block, seed),
 		block.getFieldValue('SIZE'),	
 		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
 		new THREE.Color(block.getFieldValue('FAR_COLOR'))
