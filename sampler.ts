@@ -59,45 +59,57 @@ export class CubeMaterialSampler implements Sampler {
         this.maxtest = maxtest;        
     }
 
+    private plotSample(u: number, v: number, facei: number) {
+        var canvas = <HTMLCanvasElement>document.getElementById("debug-canvas-" + (facei + 1));
+        var ctx = canvas.getContext("2d");
+
+        var r = 255, g = 0, b = 0, a = 255;
+
+        var id = ctx.createImageData(1,1);
+        var d  = id.data;
+        d[0]  = r;
+        d[1]  = g;
+        d[2]  = b;
+        d[3]  = a;
+        ctx.putImageData( id, Math.floor(u * this.maskSize), Math.floor(v * this.maskSize));
+    }
+
     public sample() : THREE.Vector3 {
         
-        var maxu = -1, maxv = -1, maxf = -1, maxn = -1;
+        var bestu = -1, bestv = -1, bestn = 1.0;
         
+        var facei = Math.floor(this.rand() * 6);
+
         for (var testi = 0; testi < this.maxtest; ++testi) {
             // pick random co-ords on the top face
             var rU = this.rand();
             var rV = this.rand();
 
-            var u = Math.floor(rU * this.maskSize);
-            var v = Math.floor(rV * this.maskSize);
+            var mU = Math.floor(rU * this.maskSize);
+            var mV = Math.floor(rV * this.maskSize);
 
-            // pick a random face
-            var facei = Math.floor(this.rand() * 6);
-          
             // get the normalized noise value
-            var n = this.faces[facei][((v * this.maskSize) + u) * 4] / 255;
+            var n = this.faces[facei][((mV * this.maskSize) + mU) * 4] / 255;
 
-            if (maxn < n) {
-                maxu = rU;
-                maxv = rV;
-                maxf = facei;
-                maxn = n;
+            if (bestn > n) {
+                bestu = rU;
+                bestv = rV;
+                bestn = n;
             }
 
+            var r = this.rand();
             // now see if the random value is less than the noise value
             // should give us a greater density of points for higher noise values
-            if (this.threshold > n) {
+            if (r * r > n) {
                 break;
             }
         }
 
-        var p = new THREE.Vector3( (maxu * 2.0) - 1.0 , 1.0, (maxv * 2.0) - 1.0);
+        this.plotSample(bestu, bestv, facei);
         
-        CubeMaterialSampler.RotatePoint(p, maxf);
+        var p = CubeMaterialSampler.ProjectPoint(bestu, bestv, facei);
+        p.normalize();
 
-        // TODO: properly project back from cube to sphere
-        // p.normalize();
-        
         return p;
     }
 
@@ -142,42 +154,28 @@ export class CubeMaterialSampler implements Sampler {
         return faces;
     }
 
-    private static RotatePoint(p: THREE.Vector3, facei: number) : void
+    private static ProjectPoint(u: number, v: number, facei: number) : THREE.Vector3
     {
-        var vTmp = p.clone();
+        u = 2 * u - 1;
+        v = 2 * v - 1;
 
-        if(facei == 0) {
-            // right
-            p.x = vTmp.y;
-            p.y = -vTmp.z;
-            p.z = -vTmp.x;
-        }
-        else if(facei == 1) {
-            // left
-            p.x = -vTmp.y;
-            p.y = -vTmp.z;
-            p.z = vTmp.x;
-        }
-        else if(facei == 2) {
-            // top - do nothing
-        }
-        else if(facei == 3) {
-            // bottom
-            p.y = -vTmp.y;
-            p.z = -vTmp.z;
-        }
-        else if(facei == 4) {
-            // front
-            p.y = -vTmp.z;
-            p.z = vTmp.y;
-        }
-        else if(facei ==  5) {
-            // back
-            p.x = -vTmp.x;
-            p.y = -vTmp.z;
-            p.z = -vTmp.y;
-        }
-        p.z = -p.z;
+        switch(facei) {
+        case 0:
+            return new THREE.Vector3( 1, -v, -u);
+        case 1:
+            return new THREE.Vector3(-1, -v,  u);
+        case 2:
+            return new THREE.Vector3( u,  1,  v);
+        case 3:
+            return new THREE.Vector3( u, -1, -v);
+        case 4:
+            return new THREE.Vector3( u, -v,  1);
+        case 5:
+            return new THREE.Vector3(-u, -v, -1);
+        default:
+       }
+
+       return new THREE.Vector3();
     }
 
     private maskSize : number;
