@@ -86,8 +86,6 @@ Layers['gas'] = (block) => {
 	) : null;
 };
 
-
-
 Layers['dwarf_stars'] = (block) => {
 
 	var seed = block.getFieldValue('SEED');
@@ -147,7 +145,7 @@ Layers['rfbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 				);
 };
 
-var view = document.getElementById("nebula-view");
+var view = document.getElementById("stargazer-view");
 var blockly = document.getElementById("blockly-div");
 var workspace : any;
 
@@ -185,17 +183,48 @@ function updateScene() : void {
 }
 
 function doResize(): void {
-	var w = view.offsetWidth, h = window.innerHeight - document.getElementById("header").offsetHeight;
-	w *= 0.95;
-	h *= 0.95;
-	renderer.setSize(w, h);
-	blockly.style.height = h + "px";
-	Blockly.svgResize(workspace);
-	camera.updateProjectionMatrix();
+	var doc = <any>document;
+	if (!doc.mozFullScreenElement && !doc.webkitFullscreenElement) {
+		var w = view.offsetWidth, h = window.innerHeight - document.getElementById("header").offsetHeight;
+		w *= 0.95;
+		h *= 0.95;
+		renderer.setSize(w, h);
+		blockly.style.height = h + "px";
+		Blockly.svgResize(workspace);
+		camera.updateProjectionMatrix();
+	} else {
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		camera.updateProjectionMatrix();
+	}
+}
+
+function toggleFullScreen() {
+	var doc = <any>document;
+	if (!doc.mozFullScreenElement && !doc.webkitFullscreenElement) {
+		var canvas = <any>renderer.domElement;
+		if (canvas.mozRequestFullScreen) {
+			canvas.mozRequestFullScreen();
+		} else {
+			canvas.webkitRequestFullscreen((<any>Element).ALLOW_KEYBOARD_INPUT);
+		}
+	} else {
+		if (doc.mozCancelFullScreen) {
+			doc.mozCancelFullScreen();
+		} else {
+			doc.webkitExitFullscreen();
+		}
+	}
 }
 
 window.addEventListener('resize', doResize);
 window.addEventListener('load', () => {
+
+	document.addEventListener("keydown", e => {
+		if (e.keyCode == 122) {
+			e.preventDefault();
+			toggleFullScreen();
+		}
+	}, false);
 
 	workspace = Blockly.inject('blockly-div',
     {media: 'bower_components/google-blockly/media/',
@@ -218,8 +247,13 @@ window.addEventListener('load', () => {
 	camera.position.z = 0.01;
 		
 	view.appendChild(renderer.domElement);
+	renderer.domElement.style.background = "black";
+
+	renderer.domElement.addEventListener("dblclick", e => {
+		toggleFullScreen();
+	}, false);
 				
-	controls = new THREE.OrbitControls(camera, document.getElementById("nebula-view"));	
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
 	controls.enablePan = controls.enableZoom = controls.enableKeys = false;
 	controls.target.set(0, 0, 0);
 
