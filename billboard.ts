@@ -33,6 +33,7 @@ export class Billboards extends THREE.Mesh {
 
 	public constructor(		
 		seed: string,
+		imagePath: string,
 		numBillboards : number,
 		sampler: Sampler,
 		size : number,
@@ -40,7 +41,7 @@ export class Billboards extends THREE.Mesh {
 		far : THREE.Color) {
 		
 	 	var textureLoader = new THREE.TextureLoader();
-	 	var texture = textureLoader.load( "images/flare-blue-purple2.png" );
+	 	var texture = textureLoader.load( imagePath );
 			
 		super(new THREE.Geometry(), new THREE.MeshBasicMaterial({
 				side: THREE.FrontSide, 

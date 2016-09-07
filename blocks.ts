@@ -106,7 +106,7 @@ Blockly.Blocks['dwarf_stars'] = {
   }
 };
 
-// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#im2r56
+// https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#garxe9
 Blockly.Blocks['giant_stars'] = {
   init: function() {
     this.appendDummyInput()
@@ -119,11 +119,15 @@ Blockly.Blocks['giant_stars'] = {
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_RIGHT)
         .appendField("Cardinality")
-        .appendField(new Blockly.FieldNumber(0, 0), "CARDINALITY");
+        .appendField(new Blockly.FieldNumber(100, 0), "CARDINALITY");
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Size")
-        .appendField(new Blockly.FieldNumber(0, 0), "SIZE");
+        .appendField("Near size")
+        .appendField(new Blockly.FieldNumber(0, 0), "NEAR_SIZE");
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("Far size")
+        .appendField(new Blockly.FieldNumber(0, 0), "FAR_SIZE");
     this.appendDummyInput()
         .setAlign(Blockly.ALIGN_RIGHT)
         .appendField("Near color")
@@ -132,6 +136,9 @@ Blockly.Blocks['giant_stars'] = {
         .setAlign(Blockly.ALIGN_RIGHT)
         .appendField("Far color")
         .appendField(new Blockly.FieldColour("#3366ff"), "FAR_COLOR");
+    this.appendDummyInput()
+        .appendField("Texture")
+        .appendField(new Blockly.FieldDropdown([["default", "default"], ["flare-blue-purple1", "flare-blue-purple1"], ["flare-blue-purple2", "flare-blue-purple2"], ["flare-blue-purple3", "flare-blue-purple3"], ["flare-blue-spikey1", "flare-blue-spikey1"], ["flare-green1", "flare-green1"], ["flare-inverted-blue-purple3", "flare-inverted-blue-purple3"], ["flare-red1", "flare-red1"], ["flare-red-yellow1", "flare-red-yellow1"], ["flare-white-small1", "flare-white-small1"], ["sun", "sun"]]), "TEXTURE");
     this.appendValueInput("MASK")
         .setCheck("Mask")
         .setAlign(Blockly.ALIGN_RIGHT)

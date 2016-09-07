@@ -104,11 +104,14 @@ Layers['giant_stars'] = (block) => {
 	
 	var seed = block.getFieldValue('SEED');
 
+	var imagePath = "images/" + block.getFieldValue('TEXTURE') + ".png";
+
 	return new Billboards(		
-		seed,		
+		seed,
+		imagePath,		
 		block.getFieldValue('CARDINALITY'),
 		getSampler(block, seed),
-		block.getFieldValue('SIZE'),	
+		block.getFieldValue('NEAR_SIZE'),	
 		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
 		new THREE.Color(block.getFieldValue('FAR_COLOR'))
 	);
@@ -169,7 +172,7 @@ function updateScene() : void {
 			var layer = Layers[block.type](block);
 			if (layer) {
 				if (first) {
-					layer.material.transparent = false;
+					//layer.material.transparent = false;
 					first = false;
 				}
 				scene.add(layer);			
