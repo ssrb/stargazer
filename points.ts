@@ -43,12 +43,9 @@ export class Points extends THREE.Points {
 		var geometry = new THREE.Geometry();
 		
 		var rand = seedrandom(seed);
-		
-		var radius = 1;
-		
+
 		for (var pi = 0; pi < numPoints; ++pi) {
 			var p = sampler.sample();
-			p.multiplyScalar(radius);
 			geometry.vertices.push(p);
 			geometry.colors.push(
 	 			far.clone().lerp(near, rand())

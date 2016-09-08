@@ -26,6 +26,7 @@
 // either expressed or implied, of the FreeBSD Project.
 
 ///<reference path="typings/index.d.ts"/>
+var seedrandom = require('./bower_components/seedrandom/seedrandom.min.js');
 
 import { Sampler } from "./sampler";
 
@@ -36,7 +37,8 @@ export class Billboards extends THREE.Mesh {
 		imagePath: string,
 		numBillboards : number,
 		sampler: Sampler,
-		size : number,
+		nearSize : number,
+		farSize : number,
 		near : THREE.Color,
 		far : THREE.Color) {
 		
@@ -52,22 +54,23 @@ export class Billboards extends THREE.Mesh {
 			}))
 
 		var billboard = new THREE.Mesh( 
-			new THREE.PlaneGeometry(0.1, 0.1),
+			new THREE.PlaneGeometry(1, 1),
 			this.material
 		);	
 		
-		var radius = 1;
+		var rand = seedrandom(seed);
 				
 		for (var pi = 0; pi < numBillboards; ++pi) {
 			var p = sampler.sample();
-
-			p.multiplyScalar(radius);
 
  	  		var b = billboard.clone();
 
  			b.position.x = p.x;
  			b.position.y = p.y;
  			b.position.z = p.z;
+
+			var howFar = rand();
+			b.scale.x = b.scale.y = farSize + (nearSize - farSize) * howFar; 			
 
  			b.lookAt(new THREE.Vector3(0, 0, 0));
 

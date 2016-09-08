@@ -93,8 +93,8 @@ Layers['dwarf_stars'] = (block) => {
 	return new Points(
 		getSampler(block, seed),
 		seed,
-		block.getFieldValue('CARDINALITY'),
-		block.getFieldValue('SIZE'),	
+		Number(block.getFieldValue('CARDINALITY')),
+		Number(block.getFieldValue('SIZE')),
 		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
 		new THREE.Color(block.getFieldValue('FAR_COLOR'))		
 	);
@@ -109,9 +109,10 @@ Layers['giant_stars'] = (block) => {
 	return new Billboards(		
 		seed,
 		imagePath,		
-		block.getFieldValue('CARDINALITY'),
+		Number(block.getFieldValue('CARDINALITY')),
 		getSampler(block, seed),
-		block.getFieldValue('NEAR_SIZE'),	
+		Number(block.getFieldValue('NEAR_SIZE')),
+		Number(block.getFieldValue('FAR_SIZE')),
 		new THREE.Color(block.getFieldValue('NEAR_COLOR')),
 		new THREE.Color(block.getFieldValue('FAR_COLOR'))
 	);
@@ -122,13 +123,13 @@ Layers['fbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 					block.getFieldValue('SEED'),
 					inner,
 					outer,
-					block.getFieldValue('DITHER'),
-					block.getFieldValue('GAIN'),
-					block.getFieldValue('LACUNARITY'),					
-					block.getFieldValue('OCTAVES'),
-					block.getFieldValue('POWER'),
-					block.getFieldValue('THRESHOLD'),
-					block.getFieldValue('SCALE')
+					Number(block.getFieldValue('DITHER')),
+					Number(block.getFieldValue('GAIN')),
+					Number(block.getFieldValue('LACUNARITY')),					
+					Number(block.getFieldValue('OCTAVES')),
+					Number(block.getFieldValue('POWER')),
+					Number(block.getFieldValue('THRESHOLD')),
+					Number(block.getFieldValue('SCALE'))
 				);
 };
 
@@ -137,14 +138,14 @@ Layers['rfbm_noise'] = (block, inner : THREE.Color, outer : THREE.Color) => {
 					block.getFieldValue('SEED'),
 					inner,
 					outer,
-					block.getFieldValue('DITHER'),
-					block.getFieldValue('GAIN'),
-					block.getFieldValue('LACUNARITY'),
-					block.getFieldValue('OFFSET'),
-					block.getFieldValue('OCTAVES'),
-					block.getFieldValue('POWER'),
-					block.getFieldValue('THRESHOLD'),
-					block.getFieldValue('SCALE')
+					Number(block.getFieldValue('DITHER')),
+					Number(block.getFieldValue('GAIN')),
+					Number(block.getFieldValue('LACUNARITY')),
+					Number(block.getFieldValue('OFFSET')),
+					Number(block.getFieldValue('OCTAVES')),
+					Number(block.getFieldValue('POWER')),
+					Number(block.getFieldValue('THRESHOLD')),
+					Number(block.getFieldValue('SCALE'))
 				);
 };
 
