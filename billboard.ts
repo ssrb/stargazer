@@ -45,35 +45,34 @@ export class Billboards extends THREE.Mesh {
 	 	var textureLoader = new THREE.TextureLoader();
 	 	var texture = textureLoader.load( imagePath );
 			
-		super(new THREE.Geometry(), new THREE.MeshBasicMaterial({
-				side: THREE.FrontSide, 
-				map: texture, 
-				transparent: true, 
-				depthTest: false, 
-				depthWrite: false
-			}))
-
-		var billboard = new THREE.Mesh( 
-			new THREE.PlaneGeometry(1, 1),
-			this.material
-		);	
+		super(new THREE.Geometry(), new THREE.MeshBasicMaterial())
 		
 		var rand = seedrandom(seed);
 				
 		for (var pi = 0; pi < numBillboards; ++pi) {
 			var p = sampler.sample();
 
- 	  		var b = billboard.clone();
+			var howFar = rand();
+			var size = farSize + (nearSize - farSize) * howFar;
+
+ 	  		var b = new THREE.Mesh( 
+				new THREE.PlaneGeometry(size, size),
+				new THREE.MeshBasicMaterial({
+					color: far.clone().lerp(near, howFar).getHex(),
+					side: THREE.FrontSide, 
+					map: texture, 
+					transparent: true, 
+					depthTest: false, 
+					depthWrite: false
+				})
+			);	
 
  			b.position.x = p.x;
  			b.position.y = p.y;
  			b.position.z = p.z;
-
-			var howFar = rand();
-			b.scale.x = b.scale.y = farSize + (nearSize - farSize) * howFar; 			
-
+					
  			b.lookAt(new THREE.Vector3(0, 0, 0));
-
+ 			
  			b.updateMatrix();
  			b.matrixAutoUpdate = false;
  			this.add(b);			
