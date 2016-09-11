@@ -1,14 +1,14 @@
 {
-  "name": "nebula",
+  "name": "stargazer",
   "version": "1.0.0",
-  "description": "A nebula generator",
-  "main": "nebula.js",
+  "description": "A star system generator",
+  "main": "stargazer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ssrb/nebula.git"
+    "url": "git+https://github.com/ssrb/stargazer.git"
   },
   "keywords": [
     "generative",
@@ -17,9 +17,9 @@
   "author": "ssrb",
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/ssrb/nebula/issues"
+    "url": "https://github.com/ssrb/stargazer/issues"
   },
-  "homepage": "https://github.com/ssrb/nebula#readme",
+  "homepage": "https://github.com/ssrb/stargazer#readme",
   "dependencies": {
     "brfs": "^1.4.3",
     "browserify": "^13.0.0",

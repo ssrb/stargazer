@@ -1,7 +1,7 @@
 {
-  "name": "nebula",
-  "description": "A nebula generator",
-  "main": "nebula.js",
+  "name": "stargazer",
+  "description": "A stargazer generator",
+  "main": "stargazer.js",
   "authors": [
     "ssrb"
   ],
@@ -10,7 +10,7 @@
     "generative",
     "art"
   ],
-  "homepage": "https://github.com/ssrb/nebula",
+  "homepage": "https://github.com/ssrb/stargazer",
   "moduleType": [],
   "ignore": [
     "**/.*",
