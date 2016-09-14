@@ -73,7 +73,7 @@ gulp.task('.stargazer.release', function() {
 gulp.task('default', function(callback) {
     runSequence('.bower.install',
                 '.typings.install',
-                '.stargazer',
+                '.stargazer.release',
                 callback);
 });
 
