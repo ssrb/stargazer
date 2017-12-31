@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>stargazer</title>
+
+    <!-- jQuery -->
+	<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+
+	<!-- Bootstrap CSS layout -->
+	<link rel="stylesheet" type="text/css"  href="bower_components/bootstrap/dist/css/bootstrap.css"/>
+	
+	<!-- Three -->
+	<script type="text/javascript" src="bower_components/three.js/three.min.js"></script>
+	<script type="text/javascript" src="OrbitControls.js"></script>
+
+  	<script type="text/javascript" src="bower_components/google-blockly/blockly_compressed.js"></script>
+  	<script type="text/javascript" src="bower_components/google-blockly/blocks_compressed.js"></script>
+	<script type="text/javascript" src="bower_components/google-blockly/javascript_compressed.js"></script>
+  	<script type="text/javascript" src="bower_components/google-blockly/msg/js/en.js"></script>
+
+	<style>
+		.title {
+			font-family: Consolas,monospace;
+			font-size: x-small;
+			background: white;
+			border: 0px;
+		}
+
+		.CodeMirror {		 
+		  border: 1px solid gray;
+		}
+
+		.vcenter {
+		    display: inline-block;
+		    vertical-align: middle;
+		    float: none;
+		}
+	</style>
+
+</head>
+
+<body>
+
+<pre class="title col-lg-12" id="header">        _
+  ___ _| |_ _____  ____ ____ _____ _____ _____  ____
+ /___|_   _|____ |/ ___) _  (____ (___  ) ___ |/ ___) beta
+|___ | | |_/ ___ | |  ( (_| / ___ |/ __/| ____| |
+(___/   \__)_____|_|   \___ \_____(_____)_____)_|
+                      (_____| (c) 2016 SSRB
+ </pre>
+
+<div class="row">	
+	<div class="col-lg-4" id="blockly-div"></div>
+    <div class="col-lg-8" id="stargazer-view"></div>
+</div>
+
+<p style="text-align:center">************ hint: double click canvas for full screen mode ************</p>
+
+<div id="debug" class="row">	
+		<canvas id="debug-canvas-1"></canvas>
+		<canvas id="debug-canvas-2"></canvas>
+		<canvas id="debug-canvas-3"></canvas>
+		<canvas id="debug-canvas-4"></canvas>
+		<canvas id="debug-canvas-5"></canvas>
+		<canvas id="debug-canvas-6"></canvas>
+</div>
+
+<xml id="blockly-toolbox" style="display: none">	
+	<category name="Stars & gas" colour="290">
+		<block type="gas"></block>	
+		<block type="dwarf_stars"></block>
+		<block type="giant_stars"></block>
+	</category>	
+	<category name="Noise" colour="20">
+		<block type="fbm_noise"></block>
+		<block type="rfbm_noise"></block>
+	</category>
+	
+</xml>
+
+<xml id="blockly-startBlocks" style="display: none"><block type="starsystem" id="7k}x-*e,vX*|~/A#[`;P" deletable="false" x="72" y="-308"><statement name="Layers"><block type="gas" id="~?HXCP_5Zd9qY|hIi?a?" collapsed="true"><field name="INNER_COLOR">#cc33cc</field><field name="OUTER_COLOR">#330099</field><value name="MIX"><block type="fbm_noise" id="P]1cAbz9=@JIl/oh(Uh?"><field name="SEED">PinkPurple</field><field name="OCTAVES">8</field><field name="GAIN">0.5</field><field name="SCALE">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2</field><field name="THRESHOLD">0</field></block></value><next><block type="gas" id="p*grm#_S-t^u%Rn5Jw8D" collapsed="true"><field name="INNER_COLOR">#000000</field><field name="OUTER_COLOR">#000000</field><value name="MIX"><block type="rfbm_noise" id="|:.@K(-V-f[d2^*[L7Ip"><field name="SEED">BlackRidged</field><field name="OCTAVES">8</field><field name="GAIN">0.6</field><field name="SCALE">1</field><field name="OFFSET">1</field><field name="POWER">0.8</field><field name="DITHER">0.01</field><field name="LACUNARITY">2.2</field><field name="THRESHOLD">0.4</field></block></value><next><block type="gas" id="3ALSt=1Mfedx=w+eup`s" collapsed="true"><field name="INNER_COLOR">#000000</field><field name="OUTER_COLOR">#000000</field><value name="MIX"><block type="fbm_noise" id="vO9_if]qfuR!u9yYrH0Q"><field name="SEED">BlackSmooth</field><field name="OCTAVES">6</field><field name="GAIN">0.5</field><field name="SCALE">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2</field><field name="THRESHOLD">0.3</field></block></value><next><block type="dwarf_stars" id="f:k36.K9r9GUY1~GIKY{" collapsed="true"><field name="SEED">LargePurple</field><field name="CARDINALITY">20000</field><field name="SIZE">0.004</field><field name="NEAR_COLOR">#993399</field><field name="FAR_COLOR">#000000</field><value name="MASK"><block type="fbm_noise" id="-KWVEcFuBvtp#=5@hww#"><field name="SEED">PurpleNebula</field><field name="OCTAVES">1</field><field name="GAIN">0.5</field><field name="SCALE">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2</field><field name="THRESHOLD">0</field></block></value><next><block type="dwarf_stars" id="/DnQ`!f|IQh9brAIq1pE" collapsed="true"><field name="SEED">SmallPurple</field><field name="CARDINALITY">5000</field><field name="SIZE">0.001</field><field name="NEAR_COLOR">#993399</field><field name="FAR_COLOR">#000000</field><value name="MASK"><block type="fbm_noise" id="vf+*fQ(epQ5vizHhmK.b"><field name="SEED">PurpleNebula</field><field name="OCTAVES">1</field><field name="GAIN">0.5</field><field name="SCALE">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2</field><field name="THRESHOLD">0</field></block></value><next><block type="giant_stars" id=":#F+~sIKb~vnX!.MglYc" collapsed="true"><field name="SEED">Giant</field><field name="CARDINALITY">200</field><field name="NEAR_SIZE">0.01</field><field name="FAR_SIZE">0.02</field><field name="NEAR_COLOR">#000000</field><field name="FAR_COLOR">#ffffff</field><field name="TEXTURE">flare-blue-spikey1</field><value name="MASK"><block type="rfbm_noise" id="y2n3u%MJzz(/hNyNd~jE"><field name="SEED">BlueNebula</field><field name="OCTAVES">7</field><field name="GAIN">0.6</field><field name="SCALE">1</field><field name="OFFSET">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2.25</field><field name="THRESHOLD">0.82</field></block></value><next><block type="gas" id="A[rzSx5iBF|Ag#51P=+:" collapsed="true"><field name="INNER_COLOR">#3366ff</field><field name="OUTER_COLOR">#000000</field><value name="MIX"><block type="rfbm_noise" id="9E4/MFjBSd3xiV./}C)2"><field name="SEED">BlueNebula</field><field name="OCTAVES">7</field><field name="GAIN">0.6</field><field name="SCALE">1</field><field name="OFFSET">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2.25</field><field name="THRESHOLD">0.82</field></block></value><next><block type="dwarf_stars" id="{wj[4xmdLRU#zac_i:XM" collapsed="true"><field name="SEED">LargBlue</field><field name="CARDINALITY">20000</field><field name="SIZE">0.005</field><field name="NEAR_COLOR">#336666</field><field name="FAR_COLOR">#000000</field><value name="MASK"><block type="rfbm_noise" id="dss=Y1Uk6T_n_F!vl;c2"><field name="SEED">BlueNebula</field><field name="OCTAVES">7</field><field name="GAIN">0.6</field><field name="SCALE">1</field><field name="OFFSET">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2.25</field><field name="THRESHOLD">0.82</field></block></value><next><block type="dwarf_stars" id="q]?0?PmT}qACIyxAgu`e" collapsed="true"><field name="SEED">LargBlue</field><field name="CARDINALITY">20000</field><field name="SIZE">0.001</field><field name="NEAR_COLOR">#66cccc</field><field name="FAR_COLOR">#000000</field><value name="MASK"><block type="rfbm_noise" id="{8~FCXXj0*mQ5E`*uOJH"><field name="SEED">BlueNebula</field><field name="OCTAVES">7</field><field name="GAIN">0.6</field><field name="SCALE">1</field><field name="OFFSET">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2.25</field><field name="THRESHOLD">0.82</field></block></value><next><block type="gas" id="FY*e;;/JNwPV;/S]u5sR" collapsed="true"><field name="INNER_COLOR">#ffff66</field><field name="OUTER_COLOR">#000000</field><value name="MIX"><block type="rfbm_noise" id="PlcL@_qz6(2k[F^a5=d["><field name="SEED">BlueNebula</field><field name="OCTAVES">7</field><field name="GAIN">0.6</field><field name="SCALE">1</field><field name="OFFSET">1</field><field name="POWER">1</field><field name="DITHER">0.03</field><field name="LACUNARITY">2.25</field><field name="THRESHOLD">0.91</field></block></value></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></statement></block></xml>
+
+<script src="bundle.js"></script>
+
+<a href="https://github.com/ssrb/stargazer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+
+</body>
+</html>
